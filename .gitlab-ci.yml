@@ -6,7 +6,7 @@ stages:
 include:
   - local: .gitlab/vars/dependency-proxy.yml
     rules:
-      - if: $CI_PROJECT_ID == "33426977" # Taucher2003-Group/T2003-Utils
+      - if: $T_ENABLE_DEPENDENCY_PROXY
 
 variables:
   MAVEN_IMAGE: ${PROXY_PREFIX}maven:3.8.4-openjdk
