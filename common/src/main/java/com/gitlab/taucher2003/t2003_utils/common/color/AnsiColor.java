@@ -37,4 +37,13 @@ public enum AnsiColor {
     public static String stripColors(String coloredString) {
         return coloredString.replaceAll("\u001B\\[(0|3[0-7])m", "");
     }
+
+    public static AnsiColor fromName(String name) {
+        for(var color : values()) {
+            if(color.name().equalsIgnoreCase(name)) {
+                return color;
+            }
+        }
+        return null;
+    }
 }
