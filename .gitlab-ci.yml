@@ -77,7 +77,7 @@ deploy-gitlab:
     T_USERNAME: "Job-Token"
     T_PASSWORD: $CI_JOB_TOKEN
     T_CONFIG: "gitlab"
-    T_DEPLOY_MAVEN_CLI_OPTS: "-Dt2003-utils.version-suffix=-SNAPSHOT"
+    T_DEPLOY_MAVEN_CLI_OPTS: "-Dt2003-utils.version=$CI_COMMIT_SHA"
     T_MAVEN_PROFILES: ",no-sign"
   rules:
     - if: $CI_PROJECT_ID != "33426977"
