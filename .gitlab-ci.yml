@@ -45,8 +45,7 @@ test:
 .deploy:
   stage: deploy
   script:
-    - gpg --pinentry-mode loopback --passphrase $T_GPG_PASSPHRASE --import $T_GPG_KEY
-    - mvn deploy $MAVEN_CLI_OPTS $T_DEPLOY_MAVEN_CLI_OPTS -Ddeploy.username=$T_USERNAME -Ddeploy.password=$T_PASSWORD -Dgpg.passphrase=$T_GPG_PASSPHRASE -P ci -s .gitlab/settings/$T_CONFIG.xml
+    - mvn deploy $MAVEN_CLI_OPTS $T_DEPLOY_MAVEN_CLI_OPTS -Ddeploy.username=$T_USERNAME -Ddeploy.password=$T_PASSWORD -Dgpg.passphrase=$T_GPG_PASSPHRASE -P ci${T_MAVEN_PROFILES} -s .gitlab/settings/$T_CONFIG.xml
 
 deploy-sonatype:
   extends:
@@ -54,6 +53,8 @@ deploy-sonatype:
   environment:
     name: sonatype
     action: start
+  before_script:
+    - gpg --pinentry-mode loopback --passphrase $T_GPG_PASSPHRASE --import $T_GPG_KEY
   variables:
     T_USERNAME: $T_SONATYPE_USERNAME
     T_PASSWORD: $T_SONATYPE_PASSWORD
@@ -75,6 +76,7 @@ deploy-gitlab:
     T_PASSWORD: $CI_JOB_TOKEN
     T_CONFIG: "gitlab"
     T_DEPLOY_MAVEN_CLI_OPTS: "-Dt2003-utils.version-suffix=-SNAPSHOT"
+    T_MAVEN_PROFILES: ",no-sign"
   rules:
     - if: $CI_PROJECT_ID != "33426977"
       when: never
@@ -93,6 +95,7 @@ deploy-gitlab-custom:
     T_PASSWORD: $CI_JOB_TOKEN
     T_CONFIG: "gitlab"
     T_DEPLOY_MAVEN_CLI_OPTS: "-Dt2003-utils.version=${CI_COMMIT_REF_NAME}-SNAPSHOT"
+    T_MAVEN_PROFILES: ",no-sign"
   rules:
     - if: $CI_PROJECT_ID != "33426977"
       when: never
