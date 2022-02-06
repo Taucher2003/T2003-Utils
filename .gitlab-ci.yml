@@ -83,6 +83,7 @@ deploy-gitlab:
     - if: $CI_PROJECT_ID != "33426977"
       when: never
     - if: $CI_COMMIT_TAG
+      when: never # Deployment does not work on tags. GitLab returns 400 ¯\_(ツ)_/¯
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $T_FORCE_GITLAB_DEPLOYMENT
 
