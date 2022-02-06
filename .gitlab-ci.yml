@@ -59,6 +59,8 @@ deploy-sonatype:
     T_USERNAME: $T_SONATYPE_USERNAME
     T_PASSWORD: $T_SONATYPE_PASSWORD
     T_CONFIG: "sonatype"
+    T_VERSION: $CI_COMMIT_TAG
+    T_DEPLOY_MAVEN_CLI_OPTS: "-Dt2003-utils.version=${T_VERSION}"
   rules:
     - if: $CI_PROJECT_ID != "33426977"
       when: never
