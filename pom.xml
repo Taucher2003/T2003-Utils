@@ -21,7 +21,6 @@
         <maven.compiler.source>${t2003-utils.java.version}</maven.compiler.source>
         <maven.compiler.target>${t2003-utils.java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jacoco.version>0.8.7</jacoco.version>
     </properties>
 
     <name>T2003-Utils › Parent</name>
