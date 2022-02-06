@@ -10,6 +10,7 @@ include:
 
 variables:
   MAVEN_IMAGE: ${PROXY_PREFIX}maven:3.8.4-openjdk
+  MAVEN_CLI_OPTS: -Dmaven.repo.local=.m2
 
 default:
   image: $MAVEN_IMAGE
@@ -17,32 +18,87 @@ default:
     when: on_success
     paths:
       - '**/target'
+      - '.m2'
 
 workflow:
   rules:
     - if: $CI_MERGE_REQUEST_ID
     - if: $CI_COMMIT_TAG
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $T_FORCE_PIPELINE
 
 build:
   stage: build
   script:
-    - mvn compile
+    - mvn compile $MAVEN_CLI_OPTS
 
 test:
   stage: test
   script:
-    - mvn test
+    - mvn test $MAVEN_CLI_OPTS
   artifacts:
     when: always
     reports:
       junit:
         - '**/target/surefire-reports/TEST-*.xml'
 
-deploy:
+.deploy:
   stage: deploy
   script:
-    - echo TODO
+    - gpg --pinentry-mode loopback --passphrase $T_GPG_PASSPHRASE --import $T_GPG_KEY
+    - mvn deploy $MAVEN_CLI_OPTS $T_DEPLOY_MAVEN_CLI_OPTS -Ddeploy.username=$T_USERNAME -Ddeploy.password=$T_PASSWORD -Dgpg.passphrase=$T_GPG_PASSPHRASE -P ci -s .gitlab/settings/$T_CONFIG.xml
+
+deploy-sonatype:
+  extends:
+    - .deploy
+  environment:
+    name: sonatype
+    action: start
+  variables:
+    T_USERNAME: $T_SONATYPE_USERNAME
+    T_PASSWORD: $T_SONATYPE_PASSWORD
+    T_CONFIG: "sonatype"
   rules:
+    - if: $CI_PROJECT_ID != "33426977"
+      when: never
+    - if: $CI_COMMIT_TAG
+    - if: $T_FORCE_SONATYPE_DEPLOYMENT
+
+deploy-gitlab:
+  extends:
+    - .deploy
+  environment:
+    name: gitlab
+    action: start
+  variables:
+    T_USERNAME: "Job-Token"
+    T_PASSWORD: $CI_JOB_TOKEN
+    T_CONFIG: "gitlab"
+    T_DEPLOY_MAVEN_CLI_OPTS: "-Dt2003-utils.version-suffix=-SNAPSHOT"
+  rules:
+    - if: $CI_PROJECT_ID != "33426977"
+      when: never
     - if: $CI_COMMIT_TAG
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $T_FORCE_GITLAB_DEPLOYMENT
+
+deploy-gitlab-custom:
+  extends:
+    - .deploy
+  environment:
+    name: gitlab
+    action: start
+  variables:
+    T_USERNAME: "Job-Token"
+    T_PASSWORD: $CI_JOB_TOKEN
+    T_CONFIG: "gitlab"
+    T_DEPLOY_MAVEN_CLI_OPTS: "-Dt2003-utils.version=${CI_COMMIT_REF_NAME}-SNAPSHOT"
+  rules:
+    - if: $CI_PROJECT_ID != "33426977"
+      when: never
+    - if: $CI_COMMIT_TAG
+      when: never
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: never
+    - when: manual
+      allow_failure: true
