@@ -21,6 +21,10 @@
         <maven.compiler.source>${t2003-utils.java.version}</maven.compiler.source>
         <maven.compiler.target>${t2003-utils.java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <deploy.prod.id>ossrh</deploy.prod.id>
+        <deploy.prod.url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</deploy.prod.url>
+        <deploy.snapshot.id>gitlab</deploy.snapshot.id>
+        <deploy.snapshot.url>https://gitlab.com/api/v4/projects/33426977/packages/maven</deploy.snapshot.url>
     </properties>
 
     <name>T2003-Utils › Parent</name>
@@ -48,12 +52,12 @@
 
     <distributionManagement>
         <repository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <id>${deploy.prod.id}</id>
+            <url>${deploy.prod.url}</url>
         </repository>
         <snapshotRepository>
-            <id>gitlab</id>
-            <url>https://gitlab.com/api/v4/projects/33426977/packages/maven</url>
+            <id>${deploy.snapshot.id}</id>
+            <url>${deploy.snapshot.url}</url>
         </snapshotRepository>
     </distributionManagement>
 
