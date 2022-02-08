@@ -20,7 +20,7 @@ public class DefaultLocalizer implements Localizer {
 
     @Override
     public String localize(String key) {
-        return localize(key, Locale.getDefault());
+        return localize(key, Locale.ROOT);
     }
 
     @Override
@@ -30,12 +30,12 @@ public class DefaultLocalizer implements Localizer {
 
     @Override
     public String localize(String key, Replacement... replacements) {
-        return localize(key, Locale.getDefault(), replacements);
+        return localize(key, Locale.ROOT, replacements);
     }
 
     @Override
     public String localize(String key, Locale locale, Replacement... replacements) {
-        var bundle = ResourceBundle.getBundle(bundleName, locale);
+        var bundle = ResourceBundle.getBundle(bundleName, locale, DefaultLocalizerControl.SINGLETON);
         var expandedMessage = resolveNestedStrings(key, bundle::getString);
         return applyReplacements(expandedMessage, replacements);
     }
@@ -68,5 +68,14 @@ public class DefaultLocalizer implements Localizer {
             result = replacement.apply(result);
         }
         return result;
+    }
+
+    private static final class DefaultLocalizerControl extends ResourceBundle.Control {
+        private static final DefaultLocalizerControl SINGLETON = new DefaultLocalizerControl();
+
+        @Override
+        public Locale getFallbackLocale(String baseName, Locale locale) {
+            return Locale.ROOT;
+        }
     }
 }
