@@ -8,29 +8,27 @@ import java.util.ResourceBundle;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
+/**
+ * The default implementation of the {@link Localizer} interface.
+ *
+ * It provides the most basic localization method using a {@link Locale} to define the target language.
+ *
+ * @see Localizer
+ * @see ContextLocalizer
+ */
 public class DefaultLocalizer implements Localizer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultLocalizer.class);
 
     private final String bundleName;
 
+    /**
+     * Creates a new DefaultLocalizer with a given bundle name.
+     *
+     * @param bundleName the name of the {@link ResourceBundle} to use
+     */
     public DefaultLocalizer(String bundleName) {
         this.bundleName = bundleName;
-    }
-
-    @Override
-    public String localize(String key) {
-        return localize(key, Locale.ROOT);
-    }
-
-    @Override
-    public String localize(String key, Locale locale) {
-        return localize(key, locale, new Replacement[0]);
-    }
-
-    @Override
-    public String localize(String key, Replacement... replacements) {
-        return localize(key, Locale.ROOT, replacements);
     }
 
     @Override
