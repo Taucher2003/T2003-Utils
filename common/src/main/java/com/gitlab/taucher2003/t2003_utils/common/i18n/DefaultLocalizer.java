@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 /**
@@ -34,19 +35,26 @@ public class DefaultLocalizer implements Localizer {
     @Override
     public String localize(String key, Locale locale, Replacement... replacements) {
         var bundle = ResourceBundle.getBundle(bundleName, locale, DefaultLocalizerControl.SINGLETON);
-        var expandedMessage = resolveNestedStrings(key, bundle::getString);
+        var expandedMessage = resolveNestedStrings(key, bundle::getString, bundle::containsKey);
         return applyReplacements(expandedMessage, replacements);
     }
 
     protected static final String NESTED_KEY_PATTERN_STRING = "%\\{(?<key>[^}]+)}";
     protected static final Pattern NESTED_KEY_PATTERN = Pattern.compile(NESTED_KEY_PATTERN_STRING);
 
-    protected String resolveNestedStrings(String key, Function<String, String> messageResolver) {
+    protected String resolveNestedStrings(String key, Function<String, String> messageResolver, Predicate<String> messageExistsPredicate) {
+        if (!messageExistsPredicate.test(key)) {
+            LOGGER.error("Tried to lookup '{}' which does not exist in bundle '{}'", key, bundleName);
+            return key;
+        }
         var message = messageResolver.apply(key);
         var matcher = NESTED_KEY_PATTERN.matcher(message);
-        while(matcher.find()) {
+        while (matcher.find()) {
             var nestedKey = matcher.group("key");
-            var resolvedNested = resolveNestedStrings(nestedKey, messageResolver);
+            var resolvedNested = resolveNestedStrings(nestedKey, messageResolver, messageExistsPredicate);
+            if (resolvedNested.equals(nestedKey)) {
+                continue;
+            }
             message = message.replace("%{" + nestedKey + "}", resolvedNested);
             matcher = NESTED_KEY_PATTERN.matcher(message);
         }
