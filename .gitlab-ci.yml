@@ -77,13 +77,12 @@ deploy-gitlab:
     T_USERNAME: "Job-Token"
     T_PASSWORD: $CI_JOB_TOKEN
     T_CONFIG: "gitlab"
-    T_DEPLOY_MAVEN_CLI_OPTS: "-Dt2003-utils.version=$CI_COMMIT_SHA -Ddeploy.prod.id=gitlab -Ddeploy.prod.url=https://gitlab.com/api/v4/projects/33426977/packages/maven"
+    T_DEPLOY_MAVEN_CLI_OPTS: "-Dt2003-utils.version-suffix=-SNAPSHOT"
     T_MAVEN_PROFILES: ",no-sign"
   rules:
     - if: $CI_PROJECT_ID != "33426977"
       when: never
     - if: $CI_COMMIT_TAG
-      when: never # Deployment does not work on tags. GitLab returns 400 ¯\_(ツ)_/¯
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $T_FORCE_GITLAB_DEPLOYMENT
 
