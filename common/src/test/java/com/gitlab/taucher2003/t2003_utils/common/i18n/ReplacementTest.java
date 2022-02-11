@@ -3,7 +3,6 @@ package com.gitlab.taucher2003.t2003_utils.common.i18n;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class ReplacementTest {
 
