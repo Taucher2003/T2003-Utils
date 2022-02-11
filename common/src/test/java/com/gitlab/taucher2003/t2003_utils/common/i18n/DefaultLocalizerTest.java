@@ -51,17 +51,27 @@ class DefaultLocalizerTest {
     }
 
     @Test
-    void logsNonexistentNestedKeys() {
-        var appender = new ListAppender<ILoggingEvent>();
-        appender.start();
-        AppenderAttachable<ILoggingEvent> context = (Logger) LoggerFactory.getLogger("ROOT");
-        context.addAppender(appender);
+    void logsNonexistentKeys() {
+        var appender = setupAppender();
 
-        localizer.localize("key.with.nonexistent.nested");
+        localizer.localize("key.does.not.exist");
 
         Assertions.assertThat(appender.list)
                 .extracting(ILoggingEvent::getFormattedMessage, ILoggingEvent::getLevel)
-                .containsExactly(Tuple.tuple("Tried to lookup 'non-existing' which does not exist in bundle 'i18n.default'", Level.ERROR));
+                .containsExactly(Tuple.tuple("Tried to lookup 'key.does.not.exist' which does not exist in bundle 'i18n.default'", Level.ERROR));
+    }
+
+    @Test
+    void doesNotLogOnlyInMainExistentKeys() {
+        var appender = setupAppender();
+
+        localizer.localize("key.only.in.main");
+        localizer.localize("key.only.in.main", Locale.GERMANY);
+        localizer.localize("key.only.in.main", Locale.US);
+
+        Assertions.assertThat(appender.list)
+                .extracting(ILoggingEvent::getFormattedMessage, ILoggingEvent::getLevel)
+                .isEmpty();
     }
 
     @Test
@@ -75,5 +85,13 @@ class DefaultLocalizerTest {
     void localizeFallsBackToRoot() {
         assertThat(localizer.localize("key", Locale.CANADA)).isEqualTo("key from main");
         assertThat(localizer.localize("key.with.variable", Locale.CANADA, new Replacement("variable", "var"))).isEqualTo("key from main var");
+    }
+
+    private ListAppender<ILoggingEvent> setupAppender() {
+        var appender = new ListAppender<ILoggingEvent>();
+        appender.start();
+        AppenderAttachable<ILoggingEvent> context = (Logger) LoggerFactory.getLogger("ROOT");
+        context.addAppender(appender);
+        return appender;
     }
 }
