@@ -56,7 +56,7 @@ public class Replacement implements Function<String, String>, Predicate<String> 
      */
     @Override
     public String apply(String s) {
-        return s.replaceAll("\\$\\{" + key + "}", value);
+        return s.replace("${" + key + "}", value);
     }
 
     /**
