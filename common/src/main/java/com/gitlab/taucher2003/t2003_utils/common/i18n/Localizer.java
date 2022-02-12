@@ -6,7 +6,7 @@ import java.util.Locale;
  * Top level interface for localization implementations
  *
  * @see DefaultLocalizer
- * @see ContextLocalizer
+ * @see DefaultContextLocalizer
  * @see Replacement
  */
 @FunctionalInterface

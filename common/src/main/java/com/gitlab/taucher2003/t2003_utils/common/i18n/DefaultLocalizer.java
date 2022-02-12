@@ -11,11 +11,11 @@ import java.util.regex.Pattern;
 
 /**
  * The default implementation of the {@link Localizer} interface.
- *
+ * <p>
  * It provides the most basic localization method using a {@link Locale} to define the target language.
  *
  * @see Localizer
- * @see ContextLocalizer
+ * @see DefaultContextLocalizer
  */
 public class DefaultLocalizer implements Localizer {
 

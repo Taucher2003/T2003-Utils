@@ -44,12 +44,15 @@ public class LocalizedEmbedMessageBuilder extends EmbedBuilder {
         return this;
     }
 
-    public LocalizedEmbedMessageBuilder setDescription(String description) {
+    public LocalizedEmbedMessageBuilder setDescription(@SuppressWarnings("TypeMayBeWeakened") String description) {
         return setDescription(description, new Replacement[0]);
     }
 
-    public LocalizedEmbedMessageBuilder setDescription(String description, Replacement... replacements) {
-        super.setDescription(__(description, replacements));
+    public LocalizedEmbedMessageBuilder setDescription(CharSequence description, Replacement... replacements) {
+        super.getDescriptionBuilder().setLength(0);
+        if (description != null && description.length() >= 1) {
+            appendDescription(description, replacements);
+        }
         return this;
     }
 
@@ -71,8 +74,7 @@ public class LocalizedEmbedMessageBuilder extends EmbedBuilder {
     }
 
     public LocalizedEmbedMessageBuilder setAuthor(String name, Replacement... replacements) {
-        super.setAuthor(__(name, replacements));
-        return this;
+        return setAuthor(name, null, replacements);
     }
 
     @Override
@@ -82,8 +84,7 @@ public class LocalizedEmbedMessageBuilder extends EmbedBuilder {
     }
 
     public LocalizedEmbedMessageBuilder setAuthor(String name, String url, Replacement... replacements) {
-        super.setAuthor(__(name, replacements), url);
-        return this;
+        return setAuthor(name, url, null, replacements);
     }
 
     @Override
@@ -104,8 +105,7 @@ public class LocalizedEmbedMessageBuilder extends EmbedBuilder {
     }
 
     public LocalizedEmbedMessageBuilder setFooter(String text, Replacement... replacements) {
-        super.setFooter(__(text, replacements));
-        return this;
+        return setFooter(text, null, replacements);
     }
 
     @Override

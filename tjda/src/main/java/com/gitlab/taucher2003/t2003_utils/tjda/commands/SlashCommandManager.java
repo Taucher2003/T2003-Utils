@@ -27,7 +27,8 @@ public class SlashCommandManager {
     }
 
     public SlashCommandManager(ShardManager shardManager, ThemeProvider themeProvider) {
-        this(shardManager, themeProvider, null);
+        //noinspection AnonymousInnerClass
+        this(shardManager, themeProvider, new SlashCommandManagerHook() {});
     }
 
     public SlashCommandManager(ShardManager shardManager, ThemeProvider themeProvider, SlashCommandManagerHook hook) {
@@ -46,13 +47,13 @@ public class SlashCommandManager {
             guild.updateCommands().queue();
             return;
         }
-        LOGGER.debug("Updating commands for {}/{}", guild.getName(), guild.getId());
+        LOGGER.info("Updating commands for {}/{}", guild.getName(), guild.getId());
         guild.updateCommands()
                 .addCommands(commands.stream()
                         .map(Command::asJdaObject)
                         .collect(Collectors.toList()))
                 .queue(
-                        commands -> LOGGER.debug("Updated {} commands for {}/{}", commands.size(), guild.getName(), guild.getId()),
+                        commands -> LOGGER.info("Updated {} commands for {}/{}", commands.size(), guild.getName(), guild.getId()),
                         throwable -> LOGGER.error("Failed to update commands for {}/{}", guild.getName(), guild.getId(), throwable)
                 );
     }
