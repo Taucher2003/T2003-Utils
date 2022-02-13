@@ -3,7 +3,7 @@ package com.gitlab.taucher2003.t2003_utils.tjda.commands;
 import com.gitlab.taucher2003.t2003_utils.tjda.theme.Theme;
 import com.gitlab.taucher2003.t2003_utils.tjda.theme.ThemeProvider;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.CommandInteraction;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,17 +82,17 @@ public class SlashCommandManager {
         return commands.remove(command);
     }
 
-    public void dispatch(SlashCommandEvent event) {
+    public void dispatch(CommandInteraction event) {
         var permissibleContext = new Permissible.PermissibleContext(event.getGuild(), event.getMember(), event.getUser());
         var commandOpt = getCommandByName(event.getName());
-        if(commandOpt.isEmpty()) {
+        if (commandOpt.isEmpty()) {
             LOGGER.warn("Received interaction for unknown command {}", event.getCommandString());
             return;
         }
         var command = commandOpt.get();
         var permissible = buildPermissible(command.permissible());
-        if(permissible.permitted(permissibleContext)) {
-            if(event.getSubcommandName() != null) {
+        if (permissible.permitted(permissibleContext)) {
+            if (event.getSubcommandName() != null) {
                 dispatchSubcommand(command, event, permissibleContext);
                 return;
             }
@@ -103,15 +103,15 @@ public class SlashCommandManager {
         command.permissible().handleUnpermitted(event, this);
     }
 
-    private void dispatchSubcommand(Command parent, SlashCommandEvent event, Permissible.PermissibleContext permissibleContext) {
+    private void dispatchSubcommand(Command parent, CommandInteraction event, Permissible.PermissibleContext permissibleContext) {
         var subCommandOpt = getSubCommandByName(parent, event.getSubcommandName());
-        if(subCommandOpt.isEmpty()) {
+        if (subCommandOpt.isEmpty()) {
             LOGGER.warn("Received interaction for unknown sub-command {}", event.getCommandPath());
             return;
         }
         var subCommand = subCommandOpt.get();
         var subcommandPermissible = buildPermissible(subCommand.permissible());
-        if(subcommandPermissible.permitted(permissibleContext)) {
+        if (subcommandPermissible.permitted(permissibleContext)) {
             subCommand.execute(event, getTheme(), permissibleContext);
             return;
         }

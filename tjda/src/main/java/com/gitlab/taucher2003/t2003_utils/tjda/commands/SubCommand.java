@@ -2,9 +2,9 @@ package com.gitlab.taucher2003.t2003_utils.tjda.commands;
 
 import com.gitlab.taucher2003.t2003_utils.tjda.theme.Theme;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.interactions.Interaction;
+import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.interactions.commands.CommandInteraction;
+import net.dv8tion.jda.api.interactions.commands.CommandInteractionPayload;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
@@ -54,12 +54,13 @@ public abstract class SubCommand {
         return permissible;
     }
 
-    public abstract void execute(SlashCommandEvent event, Theme theme, Permissible.PermissibleContext permissibleContext);
+    public abstract void execute(CommandInteraction event, Theme theme, Permissible.PermissibleContext permissibleContext);
 
-    protected OptionMapping findOption(CommandInteraction event, String name) {
+    protected OptionMapping findOption(CommandInteractionPayload event, String name) {
         return event.getOption(name);
     }
-    protected void replyError(MessageEmbed embed, Interaction interaction) {
+
+    protected void replyError(MessageEmbed embed, IReplyCallback interaction) {
         interaction.deferReply(true).flatMap(hook -> hook.editOriginalEmbeds(embed)).queue();
     }
 }

@@ -3,11 +3,11 @@ package com.gitlab.taucher2003.t2003_utils.tjda.commands;
 import com.gitlab.taucher2003.t2003_utils.tjda.theme.Theme;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.interactions.Interaction;
+import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.interactions.commands.CommandInteraction;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -60,7 +60,7 @@ public abstract class Command {
     }
 
     public CommandData asJdaObject() {
-        var data = new CommandData(name, description);
+        var data = Commands.slash(name, description);
         if(!subCommands.isEmpty()) {
             data.addSubcommands(subCommands.stream().map(SubCommand::asJdaObject).collect(Collectors.toList()));
         }
@@ -83,7 +83,7 @@ public abstract class Command {
         return subCommands;
     }
 
-    public abstract void execute(SlashCommandEvent event, Theme theme, Permissible.PermissibleContext permissibleContext);
+    public abstract void execute(CommandInteraction event, Theme theme, Permissible.PermissibleContext permissibleContext);
 
     protected OptionMapping findOption(CommandInteraction event, String name) {
         return event.getOption(name);
@@ -93,7 +93,7 @@ public abstract class Command {
         return Optional.ofNullable(event.getOption(name));
     }
 
-    protected void replyError(MessageEmbed embed, Interaction interaction) {
+    protected void replyError(MessageEmbed embed, IReplyCallback interaction) {
         interaction.deferReply(true).flatMap(hook -> hook.editOriginalEmbeds(embed)).queue();
     }
 }
