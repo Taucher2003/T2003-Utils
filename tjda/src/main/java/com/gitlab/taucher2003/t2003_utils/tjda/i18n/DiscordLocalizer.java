@@ -1,5 +1,7 @@
 package com.gitlab.taucher2003.t2003_utils.tjda.i18n;
 
+import com.gitlab.taucher2003.t2003_utils.common.i18n.ContextLocalizer;
+import com.gitlab.taucher2003.t2003_utils.common.i18n.DefaultContextLocalizer;
 import com.gitlab.taucher2003.t2003_utils.common.i18n.Localizer;
 import com.gitlab.taucher2003.t2003_utils.common.i18n.Replacement;
 import net.dv8tion.jda.api.entities.Guild;
@@ -12,18 +14,19 @@ import net.dv8tion.jda.api.interactions.Interaction;
  * An extended interface of {@link Localizer} providing convenience methods for localizing from specific JDA entities.
  *
  * @see Localizer
- * @see com.gitlab.taucher2003.t2003_utils.common.i18n.ContextLocalizer
+ * @see DefaultContextLocalizer
  * @see DiscordGuildLocalizer
  */
-public interface DiscordLocalizer extends Localizer {
+public interface DiscordLocalizer extends ContextLocalizer<Guild> {
 
     /**
      * Localize a message from a given key and a {@link Guild} to resolve the {@link java.util.Locale} from
      *
-     * @param key the key of the message in the {@link java.util.ResourceBundle}
+     * @param key   the key of the message in the {@link java.util.ResourceBundle}
      * @param guild the {@link Guild} to resolve the {@link java.util.Locale} from
      * @return the localized message
      */
+    @Override
     default String localize(String key, Guild guild) {
         return localize(key, guild, new Replacement[0]);
     }
@@ -38,6 +41,7 @@ public interface DiscordLocalizer extends Localizer {
      * @param replacements an array (or varargs) of {@link Replacement}s to apply on the localized message
      * @return the localized message
      */
+    @Override
     String localize(String key, Guild guild, Replacement... replacements);
 
     /**

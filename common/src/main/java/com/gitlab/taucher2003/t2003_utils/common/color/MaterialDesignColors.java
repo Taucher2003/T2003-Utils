@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.Optional;
 
-public enum Colors {
+public enum MaterialDesignColors {
     // Base Colors
     RED(new Color(0xf44336)),
     PINK(new Color(0xe91e63)),
@@ -93,7 +93,7 @@ public enum Colors {
 
     private final Color color;
 
-    Colors(Color color) {
+    MaterialDesignColors(Color color) {
         this.color = color;
     }
 
@@ -105,7 +105,7 @@ public enum Colors {
         return name().toLowerCase(Locale.ROOT).replace("_", "-");
     }
 
-    public static Optional<Colors> fromName(String name) {
+    public static Optional<MaterialDesignColors> fromName(String name) {
         return Arrays.stream(values())
                 .filter(color -> color.asName().equalsIgnoreCase(name))
                 .findFirst();

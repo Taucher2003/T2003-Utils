@@ -12,7 +12,15 @@ public class Replacement implements Function<String, String>, Predicate<String> 
     private final String value;
 
     /**
-     * @param key the name of the variable
+     * @param key   the name of the variable
+     * @param value the value which should be used to replace the variable
+     */
+    public Replacement(String key, Object value) {
+        this(key, value.toString());
+    }
+
+    /**
+     * @param key   the name of the variable
      * @param value the value which should be used to replace the variable
      */
     public Replacement(String key, String value) {
