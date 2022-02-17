@@ -1,4 +1,5 @@
 stages:
+  - sync
   - build
   - test
   - security
@@ -17,9 +18,11 @@ include:
 variables:
   T_MAVEN_IMAGE: ${PROXY_PREFIX}maven:3.8.4-openjdk
   T_MAVEN_CLI_OPTS: -Dmaven.repo.local=.m2
+  SAST_EXCLUDED_ANALYZERS: "bandit,brakeman,eslint,flawfinder,kubesec,gosec,mobsf,nodejs-scan,phpcs-security-audit,pmd-apex,security-code-scan,semgrep,sobelow"
 
 default:
   image: $T_MAVEN_IMAGE
+  interruptible: true
   cache:
     when: on_success
     paths:
@@ -35,6 +38,18 @@ default:
 
 workflow:
   rules: *workflow-rules
+
+no-interrupt:
+  stage: sync
+  interruptible: false
+  image: ${PROXY_PREFIX}alpine:edge
+  script:
+    - echo "This jobs makes sure this pipeline won't be interrupted! See https://docs.gitlab.com/ee/ci/yaml/#interruptible."
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG
+    - when: manual
+      allow_failure: true
 
 build:
   stage: build
