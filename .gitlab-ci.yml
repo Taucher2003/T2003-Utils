@@ -17,6 +17,7 @@ include:
 variables:
   T_MAVEN_IMAGE: ${PROXY_PREFIX}maven:3.8.4-openjdk
   T_MAVEN_CLI_OPTS: -Dmaven.repo.local=.m2
+  SAST_EXCLUDED_ANALYZERS: "bandit,brakeman,eslint,flawfinder,kubesec,gosec,mobsf,nodejs-scan,phpcs-security-audit,pmd-apex,security-code-scan,semgrep,sobelow"
 
 default:
   image: $T_MAVEN_IMAGE
