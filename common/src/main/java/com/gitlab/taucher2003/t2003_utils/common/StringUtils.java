@@ -2,7 +2,6 @@ package com.gitlab.taucher2003.t2003_utils.common;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -157,7 +156,7 @@ public final class StringUtils {
      * @return the result string with the leading zeros appended
      */
     public static String appendLeadingZeros(long number, int minLength) {
-        var currentLength = (number + "").length();
+        var currentLength = Long.toString(number).length();
         var missingZeros = Math.max(0, minLength - currentLength);
         return "0".repeat(missingZeros) + number;
     }

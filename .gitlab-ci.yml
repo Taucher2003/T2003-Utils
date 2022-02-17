@@ -1,41 +1,50 @@
 stages:
   - build
   - test
+  - security
   - deploy
 
 include:
   - local: .gitlab/vars/dependency-proxy.yml
     rules:
       - if: $T_ENABLE_DEPENDENCY_PROXY
+  - template: Security/SAST.gitlab-ci.yml
+  - template: Security/Dependency-Scanning.gitlab-ci.yml
+  - template: Security/License-Scanning.gitlab-ci.yml
+  - template: Security/Secret-Detection.gitlab-ci.yml
+  - template: Code-Quality.gitlab-ci.yml
 
 variables:
-  MAVEN_IMAGE: ${PROXY_PREFIX}maven:3.8.4-openjdk
-  MAVEN_CLI_OPTS: -Dmaven.repo.local=.m2
+  T_MAVEN_IMAGE: ${PROXY_PREFIX}maven:3.8.4-openjdk
+  T_MAVEN_CLI_OPTS: -Dmaven.repo.local=.m2
 
 default:
-  image: $MAVEN_IMAGE
+  image: $T_MAVEN_IMAGE
   cache:
     when: on_success
     paths:
       - '**/target'
       - '.m2'
 
-workflow:
-  rules:
+.default-rules:
+  rules: &workflow-rules
     - if: $CI_MERGE_REQUEST_ID
     - if: $CI_COMMIT_TAG
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $T_FORCE_PIPELINE
 
+workflow:
+  rules: *workflow-rules
+
 build:
   stage: build
   script:
-    - mvn compile $MAVEN_CLI_OPTS
+    - mvn compile $T_MAVEN_CLI_OPTS
 
 test:
   stage: test
   script:
-    - mvn test $MAVEN_CLI_OPTS
+    - mvn test $T_MAVEN_CLI_OPTS
   artifacts:
     when: always
     reports:
@@ -45,7 +54,7 @@ test:
 .deploy:
   stage: deploy
   script:
-    - mvn deploy $MAVEN_CLI_OPTS $T_DEPLOY_MAVEN_CLI_OPTS -Ddeploy.username=$T_USERNAME -Ddeploy.password=$T_PASSWORD -Dgpg.passphrase=$T_GPG_PASSPHRASE -P ci${T_MAVEN_PROFILES} -s .gitlab/settings/$T_CONFIG.xml
+    - mvn deploy $T_MAVEN_CLI_OPTS $T_DEPLOY_MAVEN_CLI_OPTS -Ddeploy.username=$T_USERNAME -Ddeploy.password=$T_PASSWORD -Dgpg.passphrase=$T_GPG_PASSPHRASE -P ci${T_MAVEN_PROFILES} -s .gitlab/settings/$T_CONFIG.xml
 
 deploy-sonatype:
   extends:
@@ -140,3 +149,68 @@ pages:
     paths:
       - public
     expire_in: 1 day
+
+# Template Job Configurations
+# -------------------------------------------------------
+
+.sast-analyzer:
+  stage: security
+  needs: [ ]
+
+spotbugs-sast:
+  before_script:
+    - mkdir ~/.m2 || true
+    - cp -r .m2 ~/.m2/repository
+  variables:
+    SAST_JAVA_VERSION: "11"
+    MAVEN_CLI_OPTS: "-P no-sign,no-javadoc -DskipTests $T_MAVEN_CLI_OPTS -Dmaven.repo.local=/root/.m2/repository"
+    FAIL_NEVER: "1"
+  rules:
+    - if: $SAST_DISABLED
+      when: never
+    - !reference [ .default-rules, rules ]
+
+.ds-analyzer:
+  stage: security
+  needs: [ ]
+
+gemnasium-maven-dependency_scanning:
+  variables:
+    DS_JAVA_VERSION: "11"
+    MAVEN_CLI_OPTS: "-P no-sign,no-javadoc -DskipTests $T_MAVEN_CLI_OPTS"
+  rules:
+    - if: $DEPENDENCY_SCANNING_DISABLED
+      when: never
+    - !reference [ .default-rules, rules ]
+
+license_scanning:
+  stage: security
+  needs: [ ]
+  variables:
+    LM_JAVA_VERSION: "11"
+  rules:
+    - if: $LICENSE_MANAGEMENT_DISABLED
+      when: never
+    - !reference [ .default-rules, rules ]
+
+.secret-analyzer:
+  stage: security
+  needs: [ ]
+
+secret_detection:
+  rules:
+    - if: $SECRET_DETECTION_DISABLED
+      when: never
+    - !reference [ .default-rules, rules ]
+
+code_quality:
+  cache: { }
+  stage: security
+  image: ${PROXY_PREFIX}docker:19.03.12
+  services:
+    - name: ${PROXY_PREFIX}docker:19.03.12-dind
+      alias: docker
+  rules:
+    - if: $CODE_QUALITY_DISABLED
+      when: never
+    - !reference [ .default-rules, rules ]
