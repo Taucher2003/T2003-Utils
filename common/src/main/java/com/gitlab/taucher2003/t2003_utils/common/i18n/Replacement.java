@@ -49,11 +49,11 @@ public class Replacement implements Function<String, String>, Predicate<String> 
      * @return the cloned Replacement with the {@link StringFormat}s applied
      */
     public Replacement format(StringFormat... formats) {
-        var value = this.value;
+        var newFormat = this.value;
         for (var format : formats) {
-            value = format.apply(value);
+            newFormat = format.apply(newFormat);
         }
-        return new Replacement(key, value);
+        return new Replacement(key, newFormat);
     }
 
     /**

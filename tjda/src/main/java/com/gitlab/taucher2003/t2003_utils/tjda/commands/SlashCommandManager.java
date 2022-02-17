@@ -53,7 +53,7 @@ public class SlashCommandManager {
                         .map(Command::asJdaObject)
                         .collect(Collectors.toList()))
                 .queue(
-                        commands -> LOGGER.info("Updated {} commands for {}/{}", commands.size(), guild.getName(), guild.getId()),
+                        commandList -> LOGGER.info("Updated {} commands for {}/{}", commandList.size(), guild.getName(), guild.getId()),
                         throwable -> LOGGER.error("Failed to update commands for {}/{}", guild.getName(), guild.getId(), throwable)
                 );
     }
