@@ -114,7 +114,7 @@ deploy-gitlab-custom:
   extends:
     - .deploy
   environment:
-    name: gitlab
+    name: gitlab-custom
     action: start
   variables:
     T_USERNAME: "Job-Token"
