@@ -68,6 +68,7 @@ test:
 
 .deploy:
   stage: deploy
+  resource_group: deploy-maven
   script:
     - mvn deploy $T_MAVEN_CLI_OPTS $T_DEPLOY_MAVEN_CLI_OPTS -Ddeploy.username=$T_USERNAME -Ddeploy.password=$T_PASSWORD -Dgpg.passphrase=$T_GPG_PASSPHRASE -P ci${T_MAVEN_PROFILES} -s .gitlab/settings/$T_CONFIG.xml
 
@@ -158,6 +159,7 @@ pages:
   environment:
     name: gitlab-javadoc
     action: start
+  resource_group: deploy-javadoc
   script:
     - mv javadoc public
   artifacts:
