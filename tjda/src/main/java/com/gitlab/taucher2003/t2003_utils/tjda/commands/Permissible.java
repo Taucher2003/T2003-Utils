@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.interactions.Interaction;
+import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 
 import java.util.Optional;
 
@@ -18,7 +18,7 @@ public interface Permissible {
         return true;
     }
 
-    default void handleUnpermitted(Interaction interaction, SlashCommandManager manager) {
+    default void handleUnpermitted(IReplyCallback interaction, SlashCommandManager manager) {
         var noPermissionEmbed = new EmbedBuilder()
                 .setDescription("You don't have permission to execute this command")
                 .setColor(manager.getTheme().danger())

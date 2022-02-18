@@ -5,7 +5,7 @@ import com.gitlab.taucher2003.t2003_utils.tjda.commands.Command;
 import com.gitlab.taucher2003.t2003_utils.tjda.commands.Permissible;
 import com.gitlab.taucher2003.t2003_utils.tjda.theme.Theme;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.CommandInteraction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +25,7 @@ public class PingCommand extends Command {
     }
 
     @Override
-    public void execute(SlashCommandEvent event, Theme theme, Permissible.PermissibleContext permissibleContext) {
+    public void execute(CommandInteraction event, Theme theme, Permissible.PermissibleContext permissibleContext) {
         var hookFuture = event.replyEmbeds(
                 new EmbedBuilder()
                         .setDescription("Pinging ...")
