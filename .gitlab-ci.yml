@@ -159,6 +159,7 @@ pages:
   environment:
     name: gitlab-javadoc
     action: start
+    url: https://taucher2003-group.gitlab.io/t2003-utils
   resource_group: deploy-javadoc
   script:
     - mv javadoc public
