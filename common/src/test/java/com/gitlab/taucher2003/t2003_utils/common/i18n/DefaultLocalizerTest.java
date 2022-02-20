@@ -87,6 +87,22 @@ class DefaultLocalizerTest {
         assertThat(localizer.localize("key.with.variable", Locale.CANADA, new Replacement("variable", "var"))).isEqualTo("key from main var");
     }
 
+    @Test
+    void doesNotFailWithCircularKeys() {
+        assertThat(localizer.localize("circular.key")).isEqualTo("%{circular.key2}");
+    }
+
+    @Test
+    void logsCircularKeys() {
+        var appender = setupAppender();
+
+        localizer.localize("circular.key");
+
+        Assertions.assertThat(appender.list)
+                .extracting(ILoggingEvent::getFormattedMessage, ILoggingEvent::getLevel)
+                .containsExactly(Tuple.tuple("Circular reference in 'circular.key' detected", Level.ERROR));
+    }
+
     private ListAppender<ILoggingEvent> setupAppender() {
         var appender = new ListAppender<ILoggingEvent>();
         appender.start();
