@@ -89,7 +89,7 @@ class DefaultLocalizerTest {
 
     @Test
     void doesNotFailWithCircularKeys() {
-        assertThat(localizer.localize("circular.key")).isEqualTo("%{circular.key2}");
+        assertThat(localizer.localize("circular.key")).isEqualTo("circular1 circular2 %{circular.key}");
     }
 
     @Test
@@ -100,7 +100,7 @@ class DefaultLocalizerTest {
 
         Assertions.assertThat(appender.list)
                 .extracting(ILoggingEvent::getFormattedMessage, ILoggingEvent::getLevel)
-                .containsExactly(Tuple.tuple("Circular reference in 'circular.key' detected", Level.ERROR));
+                .containsExactly(Tuple.tuple("Circular reference with nodes [circular.key, circular.key2] detected", Level.ERROR));
     }
 
     private ListAppender<ILoggingEvent> setupAppender() {

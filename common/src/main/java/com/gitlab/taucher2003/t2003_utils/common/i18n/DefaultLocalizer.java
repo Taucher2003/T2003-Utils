@@ -3,8 +3,10 @@ package com.gitlab.taucher2003.t2003_utils.common.i18n;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -35,28 +37,39 @@ public class DefaultLocalizer implements Localizer {
     @Override
     public String localize(String key, Locale locale, Replacement... replacements) {
         var bundle = ResourceBundle.getBundle(bundleName, locale, DefaultLocalizerControl.SINGLETON);
-        var expandedMessage = resolveNestedStrings(key, bundle::getString, bundle::containsKey);
+        var expandedMessage = resolveNestedStrings(key, bundle::getString, bundle::containsKey, new HashSet<>());
         return applyReplacements(expandedMessage, replacements);
     }
 
     protected static final String NESTED_KEY_PATTERN_STRING = "%\\{(?<key>[^}]+)}";
     protected static final Pattern NESTED_KEY_PATTERN = Pattern.compile(NESTED_KEY_PATTERN_STRING);
 
-    protected String resolveNestedStrings(String key, Function<String, String> messageResolver, Predicate<String> messageExistsPredicate) {
+    protected String resolveNestedStrings(String key, Function<String, String> messageResolver, Predicate<String> messageExistsPredicate, Set<String> visitedNodes) {
         if (!messageExistsPredicate.test(key)) {
             LOGGER.error("Tried to lookup '{}' which does not exist in bundle '{}'", key, bundleName);
             return key;
         }
         var message = messageResolver.apply(key);
-        var matcher = NESTED_KEY_PATTERN.matcher(message);
-        while (matcher.find()) {
-            var nestedKey = matcher.group("key");
-            var resolvedNested = resolveNestedStrings(nestedKey, messageResolver, messageExistsPredicate);
+        var currentCheckIndex = 0;
+        int startIndex, endIndex;
+        while (
+                (startIndex = message.indexOf("%{", currentCheckIndex)) >= 0
+                        && (endIndex = message.indexOf("}", currentCheckIndex + 1)) >= 0
+        ) {
+            currentCheckIndex = endIndex;
+            var nestedKey = message.substring(startIndex + 2, endIndex);
+
+            visitedNodes.add(key);
+            if (visitedNodes.contains(nestedKey)) {
+                LOGGER.error("Circular reference with nodes {} detected", visitedNodes);
+                continue;
+            }
+
+            var resolvedNested = resolveNestedStrings(nestedKey, messageResolver, messageExistsPredicate, visitedNodes);
             if (resolvedNested.equals(nestedKey)) {
                 continue;
             }
             message = message.replace("%{" + nestedKey + "}", resolvedNested);
-            matcher = NESTED_KEY_PATTERN.matcher(message);
         }
         return message;
     }
