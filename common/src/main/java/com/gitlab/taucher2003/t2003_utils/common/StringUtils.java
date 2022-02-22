@@ -160,4 +160,14 @@ public final class StringUtils {
         var missingZeros = Math.max(0, minLength - currentLength);
         return "0".repeat(missingZeros) + number;
     }
+
+    /**
+     * Removes all newlines (\r\n and \n) from the given String
+     *
+     * @param value the string to remove newlines from
+     * @return the result string with newlines removed
+     */
+    public static String removeNewlines(String value) {
+        return value.replace("\r\n", "").replace("\n", "");
+    }
 }

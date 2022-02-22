@@ -9,7 +9,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.regex.Pattern;
 
 /**
  * The default implementation of the {@link Localizer} interface.
@@ -41,14 +40,12 @@ public class DefaultLocalizer implements Localizer {
         return applyReplacements(expandedMessage, replacements);
     }
 
-    protected static final String NESTED_KEY_PATTERN_STRING = "%\\{(?<key>[^}]+)}";
-    protected static final Pattern NESTED_KEY_PATTERN = Pattern.compile(NESTED_KEY_PATTERN_STRING);
-
     protected String resolveNestedStrings(String key, Function<String, String> messageResolver, Predicate<String> messageExistsPredicate, Set<String> visitedNodes) {
         if (!messageExistsPredicate.test(key)) {
             LOGGER.error("Tried to lookup '{}' which does not exist in bundle '{}'", key, bundleName);
             return key;
         }
+        visitedNodes.add(key);
         var message = messageResolver.apply(key);
         var currentCheckIndex = 0;
         int startIndex, endIndex;
@@ -56,31 +53,34 @@ public class DefaultLocalizer implements Localizer {
                 (startIndex = message.indexOf("%{", currentCheckIndex)) >= 0
                         && (endIndex = message.indexOf("}", currentCheckIndex + 1)) >= 0
         ) {
-            currentCheckIndex = endIndex;
+            currentCheckIndex = endIndex - 1;
             var nestedKey = message.substring(startIndex + 2, endIndex);
-
-            visitedNodes.add(key);
-            if (visitedNodes.contains(nestedKey)) {
-                LOGGER.error("Circular reference with nodes {} detected", visitedNodes);
-                continue;
-            }
-
-            var resolvedNested = resolveNestedStrings(nestedKey, messageResolver, messageExistsPredicate, visitedNodes);
-            if (resolvedNested.equals(nestedKey)) {
-                continue;
-            }
-            message = message.replace("%{" + nestedKey + "}", resolvedNested);
+            message = resolveNestedString(message, nestedKey, messageResolver, messageExistsPredicate, visitedNodes);
         }
         return message;
     }
 
+    protected String resolveNestedString(String message, String nestedKey, Function<String, String> messageResolver,
+                                         Predicate<String> messageExistsPredicate, Set<String> visitedNodes) {
+        if (visitedNodes.contains(nestedKey)) {
+            LOGGER.error("Circular reference with nodes {} detected", visitedNodes);
+            return message;
+        }
+
+        var resolvedNested = resolveNestedStrings(nestedKey, messageResolver, messageExistsPredicate, visitedNodes);
+        if (resolvedNested.equals(nestedKey)) {
+            return message;
+        }
+        return message.replace("%{" + nestedKey + "}", resolvedNested);
+    }
+
     protected String applyReplacements(String message, Replacement... replacements) {
-        if(replacements.length == 0) {
+        if (replacements.length == 0) {
             return message;
         }
         var result = message;
-        for(var replacement : replacements) {
-            if(!replacement.test(message)) {
+        for (var replacement : replacements) {
+            if (!replacement.test(message)) {
                 LOGGER.warn("String '{}' does not contain replacement '{}'", message, replacement.getKey());
                 continue;
             }

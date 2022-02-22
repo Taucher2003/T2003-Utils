@@ -44,6 +44,11 @@ class DefaultLocalizerTest {
     }
 
     @Test
+    void localizeWithMultipleNestedKey() {
+        assertThat(localizer.localize("key.with.multiple.nested")).isEqualTo("nested-key key from main");
+    }
+
+    @Test
     void localizeWithNonexistentNestedKey() {
         assertThat(localizer.localize("key.with.nonexistent.nested")).isEqualTo("key from main %{non-existing}");
         assertThat(localizer.localize("key.with.nonexistent.nested", Locale.GERMANY)).isEqualTo("key from de_DE %{non-existing}");
@@ -101,6 +106,17 @@ class DefaultLocalizerTest {
         Assertions.assertThat(appender.list)
                 .extracting(ILoggingEvent::getFormattedMessage, ILoggingEvent::getLevel)
                 .containsExactly(Tuple.tuple("Circular reference with nodes [circular.key, circular.key2] detected", Level.ERROR));
+    }
+
+    @Test
+    void doesNotLogNonCircularKeys() {
+        var appender = setupAppender();
+
+        assertThat(localizer.localize("key.without.circular")).isEqualTo("circular3 key from main key from main");
+
+        Assertions.assertThat(appender.list)
+                .extracting(ILoggingEvent::getFormattedMessage, ILoggingEvent::getLevel)
+                .isEmpty();
     }
 
     private ListAppender<ILoggingEvent> setupAppender() {
