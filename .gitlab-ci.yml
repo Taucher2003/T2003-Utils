@@ -216,6 +216,7 @@ license_scanning:
   needs: [ ]
 
 secret_detection:
+  cache: { }
   rules:
     - if: $SECRET_DETECTION_DISABLED
       when: never
