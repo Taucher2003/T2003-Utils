@@ -1,32 +1,32 @@
 package com.gitlab.taucher2003.t2003_utils.tjda.theme;
 
-import com.gitlab.taucher2003.t2003_utils.common.color.MaterialDesignColors;
+import com.gitlab.taucher2003.t2003_utils.common.color.MaterialDesignColor;
 
 import java.awt.Color;
 
 public class MaterialDesignTheme implements Theme {
     @Override
     public Color primary() {
-        return MaterialDesignColors.BLUE.getColor();
+        return MaterialDesignColor.BLUE.getColor();
     }
 
     @Override
     public Color secondary() {
-        return MaterialDesignColors.INDIGO.getColor();
+        return MaterialDesignColor.INDIGO.getColor();
     }
 
     @Override
     public Color danger() {
-        return MaterialDesignColors.RED.getColor();
+        return MaterialDesignColor.RED.getColor();
     }
 
     @Override
     public Color warning() {
-        return MaterialDesignColors.ORANGE.getColor();
+        return MaterialDesignColor.ORANGE.getColor();
     }
 
     @Override
     public Color info() {
-        return MaterialDesignColors.GREEN.getColor();
+        return MaterialDesignColor.GREEN.getColor();
     }
 }
