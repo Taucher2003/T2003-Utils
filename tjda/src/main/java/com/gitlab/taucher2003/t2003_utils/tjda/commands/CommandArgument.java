@@ -9,15 +9,21 @@ public class CommandArgument {
     private final String name;
     private final String description;
     private final boolean required;
+    private final boolean autocomplete;
 
     public CommandArgument(OptionType type, String name, String description, boolean required) {
+        this(type, name, description, required, false);
+    }
+
+    public CommandArgument(OptionType type, String name, String description, boolean required, boolean autocomplete) {
         this.type = type;
         this.name = name;
         this.description = description;
         this.required = required;
+        this.autocomplete = autocomplete;
     }
 
     public OptionData asJdaObject() {
-        return new OptionData(type, name, description, required);
+        return new OptionData(type, name, description, required, autocomplete);
     }
 }

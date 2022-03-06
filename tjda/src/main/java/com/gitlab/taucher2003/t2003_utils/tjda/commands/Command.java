@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public abstract class Command {
+public abstract class Command implements CommandExecutor {
 
     protected static final Permissible UNRESTRICTED = (context) -> true;
     protected static final Permissible ADMINISTRATOR_ONLY = (context) -> context.getMember()
@@ -83,6 +83,7 @@ public abstract class Command {
         return subCommands;
     }
 
+    @Override
     public abstract void execute(CommandInteraction event, Theme theme, Permissible.PermissibleContext permissibleContext);
 
     protected OptionMapping findOption(CommandInteraction event, String name) {

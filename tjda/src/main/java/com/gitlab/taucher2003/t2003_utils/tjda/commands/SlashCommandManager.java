@@ -3,6 +3,7 @@ package com.gitlab.taucher2003.t2003_utils.tjda.commands;
 import com.gitlab.taucher2003.t2003_utils.tjda.theme.Theme;
 import com.gitlab.taucher2003.t2003_utils.tjda.theme.ThemeProvider;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.interactions.commands.CommandAutoCompleteInteraction;
 import net.dv8tion.jda.api.interactions.commands.CommandInteraction;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -117,6 +119,42 @@ public class SlashCommandManager {
         }
 
         subCommand.permissible().handleUnpermitted(event, this);
+    }
+
+    public void autocomplete(CommandAutoCompleteInteraction event) {
+        var permissibleContext = new Permissible.PermissibleContext(event.getGuild(), event.getMember(), event.getUser());
+        var commandOpt = getCommandByName(event.getName());
+        if (commandOpt.isEmpty()) {
+            LOGGER.warn("Received autocomplete for unknown command {}", event.getCommandString());
+            return;
+        }
+        var command = commandOpt.get();
+        var permissible = buildPermissible(command.permissible());
+        if (permissible.permitted(permissibleContext)) {
+            if (event.getSubcommandName() != null) {
+                autocompleteSubcommand(command, event, permissibleContext);
+                return;
+            }
+            command.autocomplete(event, permissibleContext);
+            return;
+        }
+        event.replyChoices(Collections.emptyList()).queue();
+    }
+
+    private void autocompleteSubcommand(Command parent, CommandAutoCompleteInteraction event, Permissible.PermissibleContext permissibleContext) {
+        var subCommandOpt = getSubCommandByName(parent, event.getSubcommandName());
+        if (subCommandOpt.isEmpty()) {
+            LOGGER.warn("Received autocomplete for unknown sub-command {}", event.getCommandPath());
+            return;
+        }
+        var subCommand = subCommandOpt.get();
+        var subcommandPermissible = buildPermissible(subCommand.permissible());
+        if (subcommandPermissible.permitted(permissibleContext)) {
+            subCommand.autocomplete(event, permissibleContext);
+            return;
+        }
+
+        event.replyChoices(Collections.emptyList()).queue();
     }
 
     private Permissible buildPermissible(Permissible base) {

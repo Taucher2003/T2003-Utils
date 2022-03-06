@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-public abstract class SubCommand {
+public abstract class SubCommand implements CommandExecutor {
 
     private final String name;
     private final String description;
@@ -54,6 +54,7 @@ public abstract class SubCommand {
         return permissible;
     }
 
+    @Override
     public abstract void execute(CommandInteraction event, Theme theme, Permissible.PermissibleContext permissibleContext);
 
     protected OptionMapping findOption(CommandInteractionPayload event, String name) {
