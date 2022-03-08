@@ -4,6 +4,7 @@ import com.gitlab.taucher2003.t2003_utils.tjda.theme.Theme;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
+import net.dv8tion.jda.api.interactions.commands.CommandAutoCompleteInteraction;
 import net.dv8tion.jda.api.interactions.commands.CommandInteraction;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -14,7 +15,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public abstract class Command implements CommandExecutor {
+public abstract class Command {
 
     protected static final Permissible UNRESTRICTED = (context) -> true;
     protected static final Permissible ADMINISTRATOR_ONLY = (context) -> context.getMember()
@@ -83,8 +84,11 @@ public abstract class Command implements CommandExecutor {
         return subCommands;
     }
 
-    @Override
     public abstract void execute(CommandInteraction event, Theme theme, Permissible.PermissibleContext permissibleContext);
+
+    // can be overridden
+    public void autocomplete(CommandAutoCompleteInteraction event, Permissible.PermissibleContext permissibleContext) {
+    }
 
     protected OptionMapping findOption(CommandInteraction event, String name) {
         return event.getOption(name);
