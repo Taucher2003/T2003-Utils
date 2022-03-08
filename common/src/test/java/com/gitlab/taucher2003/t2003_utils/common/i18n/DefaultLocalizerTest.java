@@ -119,6 +119,12 @@ class DefaultLocalizerTest {
                 .isEmpty();
     }
 
+    @Test
+    void keyExistsWorks() {
+        assertThat(localizer.keyExists("key")).isTrue();
+        assertThat(localizer.keyExists("bla")).isFalse();
+    }
+
     private ListAppender<ILoggingEvent> setupAppender() {
         var appender = new ListAppender<ILoggingEvent>();
         appender.start();

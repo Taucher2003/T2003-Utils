@@ -9,7 +9,6 @@ import java.util.Locale;
  * @see DefaultContextLocalizer
  * @see Replacement
  */
-@FunctionalInterface
 public interface Localizer {
 
     /**
@@ -59,5 +58,24 @@ public interface Localizer {
      * @return the localized message with replacements applied
      */
     String localize(String key, Locale locale, Replacement... replacements);
+
+    /**
+     * Checks if the given key can be resolved by the {@link Localizer}
+     *
+     * @param key the key to check
+     * @return a boolean indicating if the key can be localized
+     */
+    default boolean keyExists(String key) {
+        return keyExists(key, Locale.ROOT);
+    }
+
+    /**
+     * Checks if the given key can be resolved by the {@link Localizer}
+     *
+     * @param key    the key to check
+     * @param locale the preferred locale
+     * @return a boolean indicating if the key can be localized
+     */
+    boolean keyExists(String key, Locale locale);
 
 }
