@@ -3,6 +3,7 @@ package com.gitlab.taucher2003.t2003_utils.tjda.commands;
 import com.gitlab.taucher2003.t2003_utils.tjda.theme.Theme;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
+import net.dv8tion.jda.api.interactions.commands.CommandAutoCompleteInteraction;
 import net.dv8tion.jda.api.interactions.commands.CommandInteraction;
 import net.dv8tion.jda.api.interactions.commands.CommandInteractionPayload;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -55,6 +56,10 @@ public abstract class SubCommand {
     }
 
     public abstract void execute(CommandInteraction event, Theme theme, Permissible.PermissibleContext permissibleContext);
+
+    // can be overridden
+    public void autocomplete(CommandAutoCompleteInteraction event, Permissible.PermissibleContext permissibleContext) {
+    }
 
     protected OptionMapping findOption(CommandInteractionPayload event, String name) {
         return event.getOption(name);

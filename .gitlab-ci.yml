@@ -54,7 +54,7 @@ no-interrupt:
 build:
   stage: build
   script:
-    - mvn compile $T_MAVEN_CLI_OPTS
+    - mvn compile javadoc:javadoc $T_MAVEN_CLI_OPTS
 
 test:
   stage: test
