@@ -10,7 +10,7 @@ import java.util.Locale;
 /**
  * The composing implementation of the {@link Localizer} interface.
  * <p>
- * It takes a {@link List<Localizer>} or an array of {@link Localizer}.
+ * It takes a {@link List} or an array of {@link Localizer}.
  * This implementation localizes by searching through all given {@link Localizer}s
  * and returning the first found translation.
  *

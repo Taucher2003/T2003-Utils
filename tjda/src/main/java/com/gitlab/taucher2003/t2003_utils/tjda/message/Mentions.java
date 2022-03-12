@@ -11,8 +11,6 @@ public final class Mentions {
     /**
      * Returns a user mention for the given id.
      *
-     * <pre><@id></pre>
-     *
      * @param id the id of the user
      * @return the mention
      * @see #user(String)
@@ -23,8 +21,6 @@ public final class Mentions {
 
     /**
      * Returns a user mention for the given id.
-     *
-     * <pre><@id></pre>
      *
      * @param id the id of the user
      * @return the mention
@@ -37,8 +33,6 @@ public final class Mentions {
     /**
      * Returns a role mention for the given id.
      *
-     * <pre><@&id></pre>
-     *
      * @param id the id of the role
      * @return the mention
      * @see #role(String)
@@ -49,8 +43,6 @@ public final class Mentions {
 
     /**
      * Returns a role mention for the given id.
-     *
-     * <pre><@&id></pre>
      *
      * @param id the id of the role
      * @return the mention
@@ -63,8 +55,6 @@ public final class Mentions {
     /**
      * Returns a channel mention for the given id.
      *
-     * <pre><#id></pre>
-     *
      * @param id the id of the channel
      * @return the mention
      * @see #channel(String)
@@ -75,8 +65,6 @@ public final class Mentions {
 
     /**
      * Returns a channel mention for the given id.
-     *
-     * <pre><#id></pre>
      *
      * @param id the id of the channel
      * @return the mention
@@ -89,8 +77,6 @@ public final class Mentions {
     /**
      * Returns an emote mention for the given name and id.
      *
-     * <pre><:name:id></pre>
-     *
      * @param name the name of the emote
      * @param id   the id of the emote
      * @return the mention
@@ -102,8 +88,6 @@ public final class Mentions {
 
     /**
      * Returns an emote mention for the given name and id.
-     *
-     * <pre><:name:id></pre>
      *
      * @param name the name of the emote
      * @param id   the id of the emote
