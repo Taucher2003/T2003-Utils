@@ -44,6 +44,6 @@ public class ComposedLocalizer implements Localizer {
 
     @Override
     public boolean keyExists(String key, Locale locale) {
-        return localizers.stream().map(l -> l.keyExists(key, locale)).reduce(false, (a, b) -> a || b, (a, b) -> a || b);
+        return localizers.stream().anyMatch(l -> l.keyExists(key, locale));
     }
 }
