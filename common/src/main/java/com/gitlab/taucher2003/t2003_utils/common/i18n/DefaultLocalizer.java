@@ -17,6 +17,7 @@ import java.util.function.Predicate;
  *
  * @see Localizer
  * @see DefaultContextLocalizer
+ * @see ComposedLocalizer
  */
 public class DefaultLocalizer implements Localizer {
 
@@ -35,9 +36,18 @@ public class DefaultLocalizer implements Localizer {
 
     @Override
     public String localize(String key, Locale locale, Replacement... replacements) {
-        var bundle = ResourceBundle.getBundle(bundleName, locale, DefaultLocalizerControl.SINGLETON);
+        var bundle = getBundle(locale);
         var expandedMessage = resolveNestedStrings(key, bundle::getString, bundle::containsKey, new HashSet<>());
         return applyReplacements(expandedMessage, replacements);
+    }
+
+    @Override
+    public boolean keyExists(String key, Locale locale) {
+        return getBundle(locale).containsKey(key);
+    }
+
+    protected ResourceBundle getBundle(Locale locale) {
+        return ResourceBundle.getBundle(bundleName, locale, DefaultLocalizerControl.SINGLETON);
     }
 
     protected String resolveNestedStrings(String key, Function<String, String> messageResolver, Predicate<String> messageExistsPredicate, Set<String> visitedNodes) {

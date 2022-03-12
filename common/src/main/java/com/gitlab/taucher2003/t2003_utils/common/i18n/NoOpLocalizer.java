@@ -7,4 +7,9 @@ public class NoOpLocalizer implements Localizer {
     public String localize(String key, Locale locale, Replacement... replacements) {
         return key;
     }
+
+    @Override
+    public boolean keyExists(String key, Locale locale) {
+        return false;
+    }
 }
