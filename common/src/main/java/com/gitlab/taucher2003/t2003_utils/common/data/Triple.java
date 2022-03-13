@@ -20,6 +20,7 @@ public class Triple<F, S, T> {
      *
      * @param first  the first element
      * @param second the second element
+     * @param third  the third element
      */
     public Triple(F first, S second, T third) {
         this.first = first;
