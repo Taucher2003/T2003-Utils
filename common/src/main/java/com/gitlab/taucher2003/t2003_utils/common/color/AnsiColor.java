@@ -1,6 +1,8 @@
 package com.gitlab.taucher2003.t2003_utils.common.color;
 
-public enum AnsiColor {
+import com.gitlab.taucher2003.t2003_utils.common.i18n.StringFormat;
+
+public enum AnsiColor implements StringFormat {
 
     RESET("\u001B[0m"),
     BLACK("\u001B[30m"),
@@ -39,11 +41,22 @@ public enum AnsiColor {
     }
 
     public static AnsiColor fromName(String name) {
-        for(var color : values()) {
-            if(color.name().equalsIgnoreCase(name)) {
+        for (var color : values()) {
+            if (color.name().equalsIgnoreCase(name)) {
                 return color;
             }
         }
         return null;
+    }
+
+    /**
+     * Formats a string with the given ansi escape sequence
+     *
+     * @param s the String to be colorized
+     * @return the colorized String
+     */
+    @Override
+    public String apply(String s) {
+        return colorize(s);
     }
 }
