@@ -102,7 +102,7 @@ public class SlashCommandManager {
             return;
         }
 
-        command.permissible().handleUnpermitted(event, this);
+        hook.handleUnpermitted(event, getTheme());
     }
 
     private void dispatchSubcommand(Command parent, CommandInteraction event, Permissible.PermissibleContext permissibleContext) {
@@ -118,7 +118,7 @@ public class SlashCommandManager {
             return;
         }
 
-        subCommand.permissible().handleUnpermitted(event, this);
+        hook.handleUnpermitted(event, getTheme());
     }
 
     public void autocomplete(CommandAutoCompleteInteraction event) {

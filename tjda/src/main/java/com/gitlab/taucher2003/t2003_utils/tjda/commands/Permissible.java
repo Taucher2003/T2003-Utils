@@ -1,11 +1,9 @@
 package com.gitlab.taucher2003.t2003_utils.tjda.commands;
 
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 
 import java.util.Optional;
 
@@ -16,16 +14,6 @@ public interface Permissible {
 
     default boolean defaultEnabled() {
         return true;
-    }
-
-    default void handleUnpermitted(IReplyCallback interaction, SlashCommandManager manager) {
-        var noPermissionEmbed = new EmbedBuilder()
-                .setDescription("You don't have permission to execute this command")
-                .setColor(manager.getTheme().danger())
-                .build();
-        interaction.deferReply(true)
-                .flatMap(interactionHook -> interactionHook.editOriginalEmbeds(noPermissionEmbed))
-                .queue();
     }
 
     default Permissible or(Permissible permissible) {
