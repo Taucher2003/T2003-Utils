@@ -1,16 +1,15 @@
 package com.gitlab.taucher2003.t2003_utils.common.i18n;
 
 import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import ch.qos.logback.core.spi.AppenderAttachable;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
 class ComposedLocalizerTest {
 
@@ -56,8 +55,9 @@ class ComposedLocalizerTest {
     private ListAppender<ILoggingEvent> setupAppender() {
         var appender = new ListAppender<ILoggingEvent>();
         appender.start();
-        AppenderAttachable<ILoggingEvent> context = (Logger) LoggerFactory.getLogger("ROOT");
-        context.addAppender(appender);
+        var root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ROOT_LOGGER_NAME);
+        root.setLevel(Level.INFO);
+        root.addAppender(appender);
         return appender;
     }
 }
