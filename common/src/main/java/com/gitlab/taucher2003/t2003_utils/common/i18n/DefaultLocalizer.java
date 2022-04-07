@@ -36,6 +36,7 @@ public class DefaultLocalizer implements Localizer {
 
     @Override
     public String localize(String key, Locale locale, Replacement... replacements) {
+        LOGGER.trace("Localizing '{}' for '{}'", key, Locale.ROOT.equals(locale) ? "ROOT" : locale.toString());
         var bundle = getBundle(locale);
         var expandedMessage = resolveNestedStrings(key, bundle::getString, bundle::containsKey, new HashSet<>());
         return applyReplacements(expandedMessage, replacements);
@@ -51,6 +52,7 @@ public class DefaultLocalizer implements Localizer {
     }
 
     protected String resolveNestedStrings(String key, Function<String, String> messageResolver, Predicate<String> messageExistsPredicate, Set<String> visitedNodes) {
+        LOGGER.debug("Looking up '{}' in bundle '{}'", key, bundleName);
         if (!messageExistsPredicate.test(key)) {
             LOGGER.error("Tried to lookup '{}' which does not exist in bundle '{}'", key, bundleName);
             return key;
@@ -65,6 +67,7 @@ public class DefaultLocalizer implements Localizer {
         ) {
             currentCheckIndex = endIndex - 1;
             var nestedKey = message.substring(startIndex + 2, endIndex);
+            LOGGER.trace("Resolving nested string '{}' in '{}'", nestedKey, key);
             message = resolveNestedString(message, nestedKey, messageResolver, messageExistsPredicate, visitedNodes);
         }
         return message;

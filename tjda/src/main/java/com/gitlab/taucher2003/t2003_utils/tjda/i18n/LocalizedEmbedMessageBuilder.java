@@ -29,8 +29,7 @@ public class LocalizedEmbedMessageBuilder extends EmbedBuilder {
     }
 
     public LocalizedEmbedMessageBuilder setTitle(String title, Replacement... replacements) {
-        super.setTitle(__(title, replacements));
-        return this;
+        return setTitle(title, null, replacements);
     }
 
     @Override
