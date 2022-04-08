@@ -29,4 +29,10 @@ class ReplacementTest {
         assertThat(replacement.test("Test %{key}")).isFalse();
         assertThat(replacement.test("Test ${value}")).isFalse();
     }
+
+    @Test
+    void canBeUsedWithNonStringValues() {
+        var replacement = new Replacement("key", 1);
+        assertThat(replacement.getValue()).isEqualTo("1");
+    }
 }
