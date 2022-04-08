@@ -59,12 +59,19 @@ build:
 test:
   stage: test
   script:
-    - mvn test $T_MAVEN_CLI_OPTS
+    - mvn test jacoco:report jacoco:report-aggregate $T_MAVEN_CLI_OPTS
+    - mv coverage/target/site/jacoco-aggregate coverage-report
+    - awk -F"," '{ total+=$4+$5; covered+=$5 } END { print "Jacoco instructions covered", 100*covered/total, "%" }' coverage-report/jacoco.csv
+    - awk -F"," '{ total+=$6+$7; covered+=$7 } END { print "Jacoco branches covered", 100*covered/total, "%" }' coverage-report/jacoco.csv
+    - awk -F"," '{ total+=$8+$9; covered+=$9 } END { print "Jacoco lines covered", 100*covered/total, "%" }' coverage-report/jacoco.csv
+  coverage: /Jacoco instructions covered (\d+\.?\d*) %/
   artifacts:
     when: always
     reports:
       junit:
         - '**/target/surefire-reports/TEST-*.xml'
+    paths:
+      - 'coverage-report'
 
 .deploy:
   stage: deploy
