@@ -25,7 +25,7 @@ public class ColorConverter extends CompositeConverter<ILoggingEvent> {
     protected String transform(ILoggingEvent iLoggingEvent, String input) {
         var colorName = getFirstOption();
         var ansiColor = AnsiColor.fromName(colorName);
-        if(ansiColor != null) {
+        if (ansiColor != null) {
             return ansiColor.colorize(input);
         }
         var level = iLoggingEvent.getLevel().toInt();

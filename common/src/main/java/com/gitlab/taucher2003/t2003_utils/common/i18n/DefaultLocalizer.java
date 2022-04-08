@@ -103,7 +103,8 @@ public class DefaultLocalizer implements Localizer {
     }
 
     private static final class DefaultLocalizerControl extends ResourceBundle.Control {
-        private static final DefaultLocalizerControl SINGLETON = new DefaultLocalizerControl();
+
+		private static final DefaultLocalizerControl SINGLETON = new DefaultLocalizerControl();
 
         @Override
         public Locale getFallbackLocale(String baseName, Locale locale) {
