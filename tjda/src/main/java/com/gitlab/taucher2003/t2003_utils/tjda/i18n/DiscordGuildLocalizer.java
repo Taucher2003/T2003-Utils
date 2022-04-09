@@ -8,6 +8,7 @@ import java.util.Locale;
 import java.util.function.Function;
 
 public class DiscordGuildLocalizer extends DefaultContextLocalizer<Guild> implements DiscordLocalizer {
+
     public DiscordGuildLocalizer(String bundleName, Function<Guild, Locale> localeResolver) {
         super(bundleName, localeResolver);
     }

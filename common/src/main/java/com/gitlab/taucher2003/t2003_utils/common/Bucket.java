@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class Bucket {
+
     private final BucketData data;
 
     private final AtomicInteger remaining;

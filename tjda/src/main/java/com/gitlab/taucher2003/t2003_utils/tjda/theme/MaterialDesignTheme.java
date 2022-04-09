@@ -5,6 +5,7 @@ import com.gitlab.taucher2003.t2003_utils.common.color.MaterialDesignColor;
 import java.awt.Color;
 
 public class MaterialDesignTheme implements Theme {
+
     @Override
     public Color primary() {
         return MaterialDesignColor.BLUE.getColor();

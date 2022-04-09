@@ -3,6 +3,7 @@ package com.gitlab.taucher2003.t2003_utils.tjda.theme;
 import java.awt.Color;
 
 public class MonokaiTheme implements Theme {
+
     @Override
     public Color primary() {
         return new Color(0x78dce8);

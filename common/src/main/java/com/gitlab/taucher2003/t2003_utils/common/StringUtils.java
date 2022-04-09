@@ -105,7 +105,7 @@ public final class StringUtils {
             return message;
         }
 
-        if(max <= 3) {
+        if (max <= 3) {
             return Stream.generate(() -> ".").limit(max).collect(Collectors.joining());
         }
 
@@ -137,7 +137,7 @@ public final class StringUtils {
             return message;
         }
 
-        if(max <= 3) {
+        if (max <= 3) {
             return Stream.generate(() -> ".").limit(max).collect(Collectors.joining());
         }
 
@@ -147,7 +147,7 @@ public final class StringUtils {
     /**
      * Appends leading zeros to a given number until the minimum length is reached
      *
-     * @param number the number to append leading zeros to
+     * @param number    the number to append leading zeros to
      * @param minLength the minimum amount of characters for the result string
      * @return the result string with the leading zeros appended
      */

@@ -41,7 +41,7 @@ public abstract class SubCommand {
 
     public SubcommandData asJdaObject() {
         var data = new SubcommandData(name, description);
-        if(!arguments.isEmpty()) {
+        if (!arguments.isEmpty()) {
             data.addOptions().addOptions(arguments.stream().map(CommandArgument::asJdaObject).collect(Collectors.toList()));
         }
         return data;

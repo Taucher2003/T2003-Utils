@@ -33,11 +33,11 @@ public interface DiscordLocalizer extends ContextLocalizer<Guild> {
 
     /**
      * Localize a message from a given key and a {@link Guild} to resolve the {@link java.util.Locale} from
-     *
+     * <p>
      * This method allows using {@link Replacement}s.
      *
-     * @param key the key of the message in the {@link java.util.ResourceBundle}
-     * @param guild the {@link Guild} to resolve the {@link java.util.Locale} from
+     * @param key          the key of the message in the {@link java.util.ResourceBundle}
+     * @param guild        the {@link Guild} to resolve the {@link java.util.Locale} from
      * @param replacements an array (or varargs) of {@link Replacement}s to apply on the localized message
      * @return the localized message
      */
@@ -47,7 +47,7 @@ public interface DiscordLocalizer extends ContextLocalizer<Guild> {
     /**
      * Localize a message from a given key and a {@link GuildMessageChannel} to resolve the {@link java.util.Locale} from
      *
-     * @param key the key of the message in the {@link java.util.ResourceBundle}
+     * @param key     the key of the message in the {@link java.util.ResourceBundle}
      * @param channel the {@link GuildMessageChannel} to resolve the {@link java.util.Locale} from
      * @return the localized message
      */
@@ -57,11 +57,11 @@ public interface DiscordLocalizer extends ContextLocalizer<Guild> {
 
     /**
      * Localize a message from a given key and a {@link GuildMessageChannel} to resolve the {@link java.util.Locale} from
-     *
+     * <p>
      * This method allows using {@link Replacement}s.
      *
-     * @param key the key of the message in the {@link java.util.ResourceBundle}
-     * @param channel the {@link GuildMessageChannel} to resolve the {@link java.util.Locale} from
+     * @param key          the key of the message in the {@link java.util.ResourceBundle}
+     * @param channel      the {@link GuildMessageChannel} to resolve the {@link java.util.Locale} from
      * @param replacements an array (or varargs) of {@link Replacement}s to apply on the localized message
      * @return the localized message
      */
@@ -72,7 +72,7 @@ public interface DiscordLocalizer extends ContextLocalizer<Guild> {
     /**
      * Localize a message from a given key and an {@link Interaction} to resolve the {@link java.util.Locale} from
      *
-     * @param key the key of the message in the {@link java.util.ResourceBundle}
+     * @param key         the key of the message in the {@link java.util.ResourceBundle}
      * @param interaction the {@link Interaction} to resolve the {@link java.util.Locale} from
      * @return the localized message
      */
@@ -82,16 +82,16 @@ public interface DiscordLocalizer extends ContextLocalizer<Guild> {
 
     /**
      * Localize a message from a given key and an {@link Interaction} to resolve the {@link java.util.Locale} from
-     *
+     * <p>
      * This method allows using {@link Replacement}s.
      *
-     * @param key the key of the message in the {@link java.util.ResourceBundle}
-     * @param interaction the {@link Interaction} to resolve the {@link java.util.Locale} from
+     * @param key          the key of the message in the {@link java.util.ResourceBundle}
+     * @param interaction  the {@link Interaction} to resolve the {@link java.util.Locale} from
      * @param replacements an array (or varargs) of {@link Replacement}s to apply on the localized message
      * @return the localized message
      */
     default String localize(String key, Interaction interaction, Replacement... replacements) {
-        if(interaction.isFromGuild()) {
+        if (interaction.isFromGuild()) {
             return localize(key, interaction.getGuild(), replacements);
         }
         return localize(key, replacements);
@@ -100,7 +100,7 @@ public interface DiscordLocalizer extends ContextLocalizer<Guild> {
     /**
      * Localize a message from a given key and an {@link MessageReceivedEvent} to resolve the {@link java.util.Locale} from
      *
-     * @param key the key of the message in the {@link java.util.ResourceBundle}
+     * @param key   the key of the message in the {@link java.util.ResourceBundle}
      * @param event the {@link MessageReceivedEvent} to resolve the {@link java.util.Locale} from
      * @return the localized message
      */
@@ -110,16 +110,16 @@ public interface DiscordLocalizer extends ContextLocalizer<Guild> {
 
     /**
      * Localize a message from a given key and an {@link MessageReceivedEvent} to resolve the {@link java.util.Locale} from
-     *
+     * <p>
      * This method allows using {@link Replacement}s.
      *
-     * @param key the key of the message in the {@link java.util.ResourceBundle}
-     * @param event the {@link MessageReceivedEvent} to resolve the {@link java.util.Locale} from
+     * @param key          the key of the message in the {@link java.util.ResourceBundle}
+     * @param event        the {@link MessageReceivedEvent} to resolve the {@link java.util.Locale} from
      * @param replacements an array (or varargs) of {@link Replacement}s to apply on the localized message
      * @return the localized message
      */
     default String localize(String key, MessageReceivedEvent event, Replacement... replacements) {
-        if(event.isFromGuild()) {
+        if (event.isFromGuild()) {
             return localize(key, event.getGuild(), replacements);
         }
         return localize(key, replacements);
@@ -128,7 +128,7 @@ public interface DiscordLocalizer extends ContextLocalizer<Guild> {
     /**
      * Localize a message from a given key and an {@link GuildChannel} to resolve the {@link java.util.Locale} from
      *
-     * @param key the key of the message in the {@link java.util.ResourceBundle}
+     * @param key     the key of the message in the {@link java.util.ResourceBundle}
      * @param channel the {@link GuildChannel} to resolve the {@link java.util.Locale} from
      * @return the localized message
      */
@@ -138,11 +138,11 @@ public interface DiscordLocalizer extends ContextLocalizer<Guild> {
 
     /**
      * Localize a message from a given key and an {@link GuildChannel} to resolve the {@link java.util.Locale} from
-     *
+     * <p>
      * This method allows using {@link Replacement}s.
      *
-     * @param key the key of the message in the {@link java.util.ResourceBundle}
-     * @param channel the {@link GuildChannel} to resolve the {@link java.util.Locale} from
+     * @param key          the key of the message in the {@link java.util.ResourceBundle}
+     * @param channel      the {@link GuildChannel} to resolve the {@link java.util.Locale} from
      * @param replacements an array (or varargs) of {@link Replacement}s to apply on the localized message
      * @return the localized message
      */

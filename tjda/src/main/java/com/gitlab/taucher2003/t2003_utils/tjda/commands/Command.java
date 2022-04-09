@@ -62,10 +62,10 @@ public abstract class Command {
 
     public CommandData asJdaObject() {
         var data = Commands.slash(name, description);
-        if(!subCommands.isEmpty()) {
+        if (!subCommands.isEmpty()) {
             data.addSubcommands(subCommands.stream().map(SubCommand::asJdaObject).collect(Collectors.toList()));
         }
-        if(!arguments.isEmpty()) {
+        if (!arguments.isEmpty()) {
             data.addOptions(arguments.stream().map(CommandArgument::asJdaObject).collect(Collectors.toList()));
         }
         data.setDefaultEnabled(permissible.defaultEnabled());

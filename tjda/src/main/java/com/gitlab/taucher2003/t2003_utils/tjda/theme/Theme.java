@@ -7,9 +7,14 @@ import java.awt.Color;
  */
 @SuppressWarnings("ClassNamePrefixedWithPackageName")
 public interface Theme {
+
     Color primary();
+
     Color secondary();
+
     Color danger();
+
     Color warning();
+
     Color info();
 }

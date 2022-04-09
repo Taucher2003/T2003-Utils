@@ -15,6 +15,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 public class FailureLoggingScheduledThreadPoolExecutor extends ScheduledThreadPoolExecutor {
+
     private static final Logger LOG = LoggerFactory.getLogger(FailureLoggingScheduledThreadPoolExecutor.class);
 
     public FailureLoggingScheduledThreadPoolExecutor(int corePoolSize) {

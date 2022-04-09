@@ -25,7 +25,7 @@ public interface ContextLocalizer<T> extends Localizer {
      * Localizes a message from a given key and dynamically resolves the {@link Locale} for the type T
      *
      * @param key the key of the message in the {@link java.util.ResourceBundle}
-     * @param t the generic type T to resolve the {@link Locale} from
+     * @param t   the generic type T to resolve the {@link Locale} from
      * @return the localized message
      */
     default String localize(String key, T t) {
@@ -34,11 +34,11 @@ public interface ContextLocalizer<T> extends Localizer {
 
     /**
      * Localizes a message from a given key and dynamically resolves the {@link Locale} for the type T
-     *
+     * <p>
      * This method allows using {@link Replacement}s.
      *
-     * @param key the key of the message in the {@link java.util.ResourceBundle}
-     * @param t the generic type T to resolve the {@link Locale} from
+     * @param key          the key of the message in the {@link java.util.ResourceBundle}
+     * @param t            the generic type T to resolve the {@link Locale} from
      * @param replacements an array (or varargs) of {@link Replacement}s to apply on the localized message
      * @return the localized message
      */
