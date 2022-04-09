@@ -6,7 +6,7 @@ IFS=$'\n'
 rm -rf javadoc
 rm -rf clone
 mkdir javadoc || true
-cat template/javadoc-header.html > javadoc/index.html
+cat .gitlab/template/javadoc-header.html > javadoc/index.html
 
 # Clone repo
 git clone $1 clone
@@ -29,4 +29,4 @@ cd ..
 rm -rf clone
 
 # Finish index page
-cat template/javadoc-footer.html >> javadoc/index.html
+cat .gitlab/template/javadoc-footer.html >> javadoc/index.html
