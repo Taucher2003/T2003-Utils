@@ -8,7 +8,7 @@ import java.util.Locale;
 
 public class LocalizedField extends MessageEmbed.Field {
 
-	private final Localizer localizer;
+    private final Localizer localizer;
     private final Locale locale;
 
     public LocalizedField(Localizer localizer, Locale locale) {

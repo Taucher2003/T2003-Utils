@@ -8,7 +8,7 @@ import java.util.List;
 
 public abstract class UserAwareListPagination<T> extends UserAwarePagination {
 
-	private final List<T> items;
+    private final List<T> items;
 
     public UserAwareListPagination(Collection<T> items, ISnowflake user) {
         this(items, user.getIdLong());

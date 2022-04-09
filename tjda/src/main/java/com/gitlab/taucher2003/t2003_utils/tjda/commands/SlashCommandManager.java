@@ -45,10 +45,10 @@ public class SlashCommandManager {
 
     public void updateCommands(Guild guild) {
         if (!hook.useSlashCommands(guild)) {
-			LOGGER.info("Deleting commands for {}/{} due to {} hook", guild.getName(), guild.getId(), hook.getClass().getCanonicalName());
-			guild.updateCommands().queue();
-			return;
-		}
+            LOGGER.info("Deleting commands for {}/{} due to {} hook", guild.getName(), guild.getId(), hook.getClass().getCanonicalName());
+            guild.updateCommands().queue();
+            return;
+        }
         LOGGER.info("Updating commands for {}/{}", guild.getName(), guild.getId());
         guild.updateCommands()
                 .addCommands(commands.stream()

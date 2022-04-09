@@ -6,7 +6,7 @@ import java.awt.Color;
 
 public class MaterialDesignTheme implements Theme {
 
-	@Override
+    @Override
     public Color primary() {
         return MaterialDesignColor.BLUE.getColor();
     }

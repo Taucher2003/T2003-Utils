@@ -4,7 +4,7 @@ import java.util.Locale;
 
 public class NoOpLocalizer implements Localizer {
 
-	@Override
+    @Override
     public String localize(String key, Locale locale, Replacement... replacements) {
         return key;
     }
