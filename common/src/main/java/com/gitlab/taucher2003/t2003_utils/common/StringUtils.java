@@ -59,10 +59,6 @@ public final class StringUtils {
      * @return the stack trace
      */
     public static String getExceptionStacktrace(Throwable throwable, int maxCharacters) {
-        if (throwable == null) {
-            return null;
-        }
-
         var builder = new StringBuilder(throwable + "\n");
 
         var currentThrowable = throwable;
@@ -169,5 +165,15 @@ public final class StringUtils {
      */
     public static String removeNewlines(String value) {
         return value.replace("\r\n", "").replace("\n", "");
+    }
+
+    /**
+     * Normalizes all newlines from \r\n to \n
+     *
+     * @param value the string to normalize the newlines from
+     * @return the result string with newlines normalized
+     */
+    public static String normalizeNewlines(String value) {
+        return value.replace("\r\n", "\n");
     }
 }

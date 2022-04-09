@@ -107,7 +107,7 @@ public enum MaterialDesignColor {
 
     public static Optional<MaterialDesignColor> fromName(String name) {
         return Arrays.stream(values())
-                .filter(color -> color.asName().equalsIgnoreCase(name))
+                .filter(color -> color.asName().equalsIgnoreCase(name.replace("_", "-")))
                 .findFirst();
     }
 }
