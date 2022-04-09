@@ -25,9 +25,11 @@ public enum AnsiColor implements StringFormat {
      *
      * @param stringToColorize the String to be colorized
      * @return the colorized String
+     * @deprecated Replaced with {@link #apply(String)}
      */
+    @Deprecated
     public String colorize(String stringToColorize) {
-        return ansi + stringToColorize + RESET.ansi;
+        return apply(stringToColorize);
     }
 
     /**
@@ -57,6 +59,11 @@ public enum AnsiColor implements StringFormat {
      */
     @Override
     public String apply(String s) {
-        return colorize(s);
+        return this + s + RESET;
+    }
+
+    @Override
+    public String toString() {
+        return ansi;
     }
 }

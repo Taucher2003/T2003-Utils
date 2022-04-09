@@ -26,10 +26,10 @@ public class ColorConverter extends CompositeConverter<ILoggingEvent> {
         var colorName = getFirstOption();
         var ansiColor = AnsiColor.fromName(colorName);
         if(ansiColor != null) {
-            return ansiColor.colorize(input);
+            return ansiColor.apply(input);
         }
         var level = iLoggingEvent.getLevel().toInt();
         var levelColor = LEVEL_COLORS.getOrDefault(level, AnsiColor.WHITE);
-        return levelColor.colorize(input);
+        return levelColor.apply(input);
     }
 }

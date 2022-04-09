@@ -28,7 +28,7 @@ public class ComposedLocalizer implements Localizer {
     }
 
     public ComposedLocalizer(Localizer... localizers) {
-        this.localizers = Arrays.asList(localizers);
+        this(Arrays.asList(localizers));
     }
 
     @Override

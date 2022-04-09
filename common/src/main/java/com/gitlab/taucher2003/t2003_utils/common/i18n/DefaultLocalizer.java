@@ -36,6 +36,11 @@ public class DefaultLocalizer implements Localizer {
 
     @Override
     public String localize(String key, Locale locale, Replacement... replacements) {
+        if (locale == null) {
+            locale = Locale.ROOT;
+            LOGGER.warn("Localizer was called with key '{}' and null locale", key);
+        }
+
         LOGGER.trace("Localizing '{}' for '{}'", key, Locale.ROOT.equals(locale) ? "ROOT" : locale.toString());
         var bundle = getBundle(locale);
         var expandedMessage = resolveNestedStrings(key, bundle::getString, bundle::containsKey, new HashSet<>());

@@ -113,15 +113,47 @@ class DefaultLocalizerTest {
 
         assertThat(localizer.localize("key.without.circular")).isEqualTo("circular3 key from main key from main");
 
-        Assertions.assertThat(appender.list)
+        assertThat(appender.list)
                 .extracting(ILoggingEvent::getFormattedMessage, ILoggingEvent::getLevel)
                 .isEmpty();
+    }
+
+    @Test
+    void doesNotFailWithUnclosedNestedString() {
+        assertThat(localizer.localize("without.closing.string.bracket")).isEqualTo("Bla %{not.closed");
     }
 
     @Test
     void keyExistsWorks() {
         assertThat(localizer.keyExists("key")).isTrue();
         assertThat(localizer.keyExists("bla")).isFalse();
+    }
+
+    @Test
+    void logsNonExistentReplacements() {
+        var appender = setupAppender();
+
+        assertThat(localizer.localize("key", new Replacement("variable", "replacement"))).isEqualTo("key from main");
+
+        assertThat(appender.list)
+                .extracting(ILoggingEvent::getFormattedMessage, ILoggingEvent::getLevel)
+                .containsExactly(Tuple.tuple("String 'key from main' does not contain replacement 'variable'", Level.WARN));
+    }
+
+    @Test
+    void canHandleNullLocale() {
+        assertThat(localizer.localize("key", (Locale) null)).isEqualTo("key from main");
+    }
+
+    @Test
+    void logsNullLocales() {
+        var appender = setupAppender();
+
+        localizer.localize("key", (Locale) null);
+
+        assertThat(appender.list)
+                .extracting(ILoggingEvent::getFormattedMessage, ILoggingEvent::getLevel)
+                .containsExactly(Tuple.tuple("Localizer was called with key 'key' and null locale", Level.WARN));
     }
 
     private ListAppender<ILoggingEvent> setupAppender() {
