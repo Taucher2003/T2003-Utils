@@ -84,11 +84,15 @@ public class SlashCommandManager {
         return commands.remove(command);
     }
 
+    public void unregisterAllCommands() {
+        commands.clear();
+    }
+
     public void dispatch(CommandInteraction event) {
         var permissibleContext = new Permissible.PermissibleContext(event.getGuild(), event.getMember(), event.getUser());
         var commandOpt = getCommandByName(event.getName());
         if (commandOpt.isEmpty()) {
-            LOGGER.warn("Received interaction for unknown command {}", event.getCommandString());
+            LOGGER.warn("Received interaction for unknown command {}", event.getCommandPath());
             return;
         }
         var command = commandOpt.get();
@@ -125,7 +129,7 @@ public class SlashCommandManager {
         var permissibleContext = new Permissible.PermissibleContext(event.getGuild(), event.getMember(), event.getUser());
         var commandOpt = getCommandByName(event.getName());
         if (commandOpt.isEmpty()) {
-            LOGGER.warn("Received autocomplete for unknown command {}", event.getCommandString());
+            LOGGER.warn("Received autocomplete for unknown command {}", event.getCommandPath());
             return;
         }
         var command = commandOpt.get();
