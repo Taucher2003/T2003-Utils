@@ -18,7 +18,7 @@ include:
 variables:
   T_MAVEN_IMAGE: ${PROXY_PREFIX}maven:3.8.4-openjdk-11
   T_MAVEN_CLI_OPTS: -Dmaven.repo.local=.m2
-  SAST_EXCLUDED_ANALYZERS: "bandit,brakeman,eslint,flawfinder,kubesec,gosec,mobsf,nodejs-scan,phpcs-security-audit,pmd-apex,security-code-scan,semgrep,sobelow"
+  SAST_EXCLUDED_ANALYZERS: "bandit,brakeman,eslint,flawfinder,kubesec,gosec,mobsf,nodejs-scan,phpcs-security-audit,pmd-apex,security-code-scan,sobelow,spotbugs"
 
 default:
   image: $T_MAVEN_IMAGE
@@ -182,14 +182,10 @@ pages:
   stage: security
   needs: [ ]
 
-spotbugs-sast:
-  before_script:
-    - mkdir ~/.m2 || true
-    - cp -r .m2 ~/.m2/repository
+semgrep-sast:
+  cache: { }
   variables:
-    SAST_JAVA_VERSION: "11"
-    MAVEN_CLI_OPTS: "-P no-sign,no-javadoc -DskipTests $T_MAVEN_CLI_OPTS -Dmaven.repo.local=/root/.m2/repository"
-    FAIL_NEVER: "1"
+    SAST_SEMGREP_METRICS: "false"
   rules:
     - if: $SAST_DISABLED
       when: never
