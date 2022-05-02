@@ -76,6 +76,9 @@ test:
 .deploy:
   stage: deploy
   resource_group: deploy-maven
+  needs:
+    - build
+    - test
   script:
     - mvn deploy $T_MAVEN_CLI_OPTS $T_DEPLOY_MAVEN_CLI_OPTS -Ddeploy.username=$T_USERNAME -Ddeploy.password=$T_PASSWORD -Dgpg.passphrase=$T_GPG_PASSPHRASE -P ci${T_MAVEN_PROFILES} -s .gitlab/settings/$T_CONFIG.xml
 
@@ -168,8 +171,14 @@ pages:
     action: start
     url: https://taucher2003-group.gitlab.io/t2003-utils
   resource_group: deploy-javadoc
+  needs:
+    - build
+    - test
   script:
-    - mv javadoc public
+    - mkdir public
+    - cp .gitlab/template/index.html public/index.html
+    - mv javadoc public/javadoc
+    - mv coverage-report public/coverage
   artifacts:
     paths:
       - public
