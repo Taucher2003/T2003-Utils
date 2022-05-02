@@ -172,7 +172,7 @@ pages:
     url: https://taucher2003-group.gitlab.io/t2003-utils
   resource_group: deploy-javadoc
   needs:
-    - build
+    - build-javadoc
     - test
   script:
     - mkdir public
