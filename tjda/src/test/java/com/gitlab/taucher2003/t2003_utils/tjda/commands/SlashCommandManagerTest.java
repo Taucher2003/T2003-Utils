@@ -50,6 +50,8 @@ class SlashCommandManagerTest {
         manager.dispatch(interaction);
         assertThat(dummyCommand.executedTimes()).isEqualTo(1);
 
+        assertThat(appender.list).isEmpty();
+
         manager.unregisterCommand(dummyCommand);
         manager.dispatch(interaction);
         assertThat(dummyCommand.executedTimes()).isEqualTo(1);
