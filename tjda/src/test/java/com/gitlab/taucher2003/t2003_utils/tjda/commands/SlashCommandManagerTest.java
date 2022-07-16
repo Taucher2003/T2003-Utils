@@ -38,6 +38,28 @@ class SlashCommandManagerTest {
     }
 
     @Test
+    void unregister() {
+        var dummyCommand = registeredCommand("dummy");
+
+        var interaction = InteractionMocker.commandInteraction()
+                .setName("dummy")
+                .build();
+
+        var appender = setupAppender();
+
+        manager.dispatch(interaction);
+        assertThat(dummyCommand.executedTimes()).isEqualTo(1);
+
+        manager.unregisterCommand(dummyCommand);
+        manager.dispatch(interaction);
+        assertThat(dummyCommand.executedTimes()).isEqualTo(1);
+
+        assertThat(appender.list)
+                .extracting(ILoggingEvent::getFormattedMessage, ILoggingEvent::getLevel)
+                .containsExactly(Tuple.tuple("Received interaction for unknown command dummy", Level.WARN));
+    }
+
+    @Test
     void dispatchSubcommand() {
         var dummySubCommand = new DummySubCommand("dummy-sub");
         var dummyCommand = registeredCommand("dummy", dummySubCommand);
