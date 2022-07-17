@@ -8,7 +8,14 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildChannel;
 import net.dv8tion.jda.api.entities.GuildMessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.DiscordLocale;
 import net.dv8tion.jda.api.interactions.Interaction;
+import net.dv8tion.jda.api.interactions.commands.localization.LocalizationFunction;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * An extended interface of {@link Localizer} providing convenience methods for localizing from specific JDA entities.
@@ -17,7 +24,7 @@ import net.dv8tion.jda.api.interactions.Interaction;
  * @see DefaultContextLocalizer
  * @see DiscordGuildLocalizer
  */
-public interface DiscordLocalizer extends ContextLocalizer<Guild> {
+public interface DiscordLocalizer extends ContextLocalizer<Guild>, LocalizationFunction {
 
     /**
      * Localize a message from a given key and a {@link Guild} to resolve the {@link java.util.Locale} from
@@ -148,5 +155,19 @@ public interface DiscordLocalizer extends ContextLocalizer<Guild> {
      */
     default String localize(String key, GuildChannel channel, Replacement... replacements) {
         return localize(key, channel.getGuild(), replacements);
+    }
+
+    @NotNull
+    @Override
+    default Map<DiscordLocale, String> apply(@NotNull String localizationKey) {
+        var map = new HashMap<DiscordLocale, String>();
+        for (var discordLocale : DiscordLocale.values()) {
+            var localeTag = discordLocale.getLocale();
+            var locale = Locale.forLanguageTag(localeTag);
+            map.put(discordLocale, localize(localizationKey, locale));
+        }
+
+        map.remove(DiscordLocale.UNKNOWN); // UNKNOWN can't be in the map
+        return map;
     }
 }

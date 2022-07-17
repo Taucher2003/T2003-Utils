@@ -52,7 +52,7 @@ public class SlashCommandManager {
         LOGGER.info("Updating commands for {}/{}", guild.getName(), guild.getId());
         guild.updateCommands()
                 .addCommands(commands.stream()
-                        .map(Command::asJdaObject)
+                        .map(command -> command.asJdaObject(hook.getLocalizationFunction()))
                         .collect(Collectors.toList()))
                 .queue(
                         commandList -> LOGGER.info("Updated {} commands for {}/{}", commandList.size(), guild.getName(), guild.getId()),

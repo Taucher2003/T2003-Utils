@@ -6,21 +6,37 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.interactions.commands.CommandAutoCompleteInteraction;
 import net.dv8tion.jda.api.interactions.commands.CommandInteraction;
+import net.dv8tion.jda.api.interactions.commands.CommandInteractionPayload;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.localization.LocalizationFunction;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 public abstract class Command {
 
     protected static final Permissible UNRESTRICTED = (context) -> true;
-    protected static final Permissible ADMINISTRATOR_ONLY = (context) -> context.getMember()
-            .map(m -> m.hasPermission(Permission.ADMINISTRATOR))
-            .orElse(false);
+
+    @SuppressWarnings("AnonymousInnerClass")
+    protected static final Permissible ADMINISTRATOR_ONLY = new Permissible() {
+        @Override
+        public List<Permission> defaultMemberPermissions() {
+            return List.of(Permission.ADMINISTRATOR);
+        }
+
+        @Override
+        public boolean permitted(PermissibleContext context) {
+            return context.getMember()
+                    .map(m -> m.hasPermission(Permission.ADMINISTRATOR))
+                    .orElse(false);
+        }
+    };
 
     private final String name;
     private final String description;
@@ -60,7 +76,7 @@ public abstract class Command {
         this.permissible = permissible;
     }
 
-    public CommandData asJdaObject() {
+    public CommandData asJdaObject(LocalizationFunction localizationFunction) {
         var data = Commands.slash(name, description);
         if (!subCommands.isEmpty()) {
             data.addSubcommands(subCommands.stream().map(SubCommand::asJdaObject).collect(Collectors.toList()));
@@ -68,7 +84,10 @@ public abstract class Command {
         if (!arguments.isEmpty()) {
             data.addOptions(arguments.stream().map(CommandArgument::asJdaObject).collect(Collectors.toList()));
         }
-        data.setDefaultEnabled(permissible.defaultEnabled());
+        if (localizationFunction != null) {
+            data.setLocalizationFunction(localizationFunction);
+        }
+        data.setDefaultPermissions(DefaultMemberPermissions.enabledFor(permissible.defaultMemberPermissions()));
         return data;
     }
 
@@ -90,11 +109,11 @@ public abstract class Command {
     public void autocomplete(CommandAutoCompleteInteraction event, Permissible.PermissibleContext permissibleContext) {
     }
 
-    protected OptionMapping findOption(CommandInteraction event, String name) {
+    protected OptionMapping findOption(CommandInteractionPayload event, String name) {
         return event.getOption(name);
     }
 
-    protected Optional<OptionMapping> findOptionOpt(CommandInteraction event, String name) {
+    protected Optional<OptionMapping> findOptionOpt(CommandInteractionPayload event, String name) {
         return Optional.ofNullable(event.getOption(name));
     }
 
