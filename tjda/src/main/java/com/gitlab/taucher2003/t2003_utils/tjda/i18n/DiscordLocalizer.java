@@ -4,6 +4,7 @@ import com.gitlab.taucher2003.t2003_utils.common.i18n.ContextLocalizer;
 import com.gitlab.taucher2003.t2003_utils.common.i18n.DefaultContextLocalizer;
 import com.gitlab.taucher2003.t2003_utils.common.i18n.Localizer;
 import com.gitlab.taucher2003.t2003_utils.common.i18n.Replacement;
+import com.gitlab.taucher2003.t2003_utils.tjda.commands.PrefixedLocalizationFunction;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildChannel;
 import net.dv8tion.jda.api.entities.GuildMessageChannel;
@@ -13,8 +14,6 @@ import net.dv8tion.jda.api.interactions.Interaction;
 import net.dv8tion.jda.api.interactions.commands.localization.LocalizationFunction;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -160,14 +159,6 @@ public interface DiscordLocalizer extends ContextLocalizer<Guild>, LocalizationF
     @NotNull
     @Override
     default Map<DiscordLocale, String> apply(@NotNull String localizationKey) {
-        var map = new HashMap<DiscordLocale, String>();
-        for (var discordLocale : DiscordLocale.values()) {
-            var localeTag = discordLocale.getLocale();
-            var locale = Locale.forLanguageTag(localeTag);
-            map.put(discordLocale, localize(localizationKey, locale));
-        }
-
-        map.remove(DiscordLocale.UNKNOWN); // UNKNOWN can't be in the map
-        return map;
+        return new PrefixedLocalizationFunction(this).apply(localizationKey);
     }
 }
