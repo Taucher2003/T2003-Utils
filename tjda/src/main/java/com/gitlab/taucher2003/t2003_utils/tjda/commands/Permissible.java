@@ -1,10 +1,13 @@
 package com.gitlab.taucher2003.t2003_utils.tjda.commands;
 
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @FunctionalInterface
@@ -12,8 +15,8 @@ public interface Permissible {
 
     boolean permitted(PermissibleContext context);
 
-    default boolean defaultEnabled() {
-        return true;
+    default List<Permission> defaultMemberPermissions() {
+        return Collections.emptyList();
     }
 
     default Permissible or(Permissible permissible) {

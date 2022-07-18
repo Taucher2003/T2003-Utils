@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.interactions.AutoCompleteCallbackAction;
+import net.dv8tion.jda.api.requests.restaction.interactions.InteractionCallbackAction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -63,5 +64,11 @@ public class AutoCompleteCallbackActionMock implements AutoCompleteCallbackActio
 
     public int executeTimes() {
         return executeTimes.get();
+    }
+
+    @NotNull
+    @Override
+    public InteractionCallbackAction<Void> closeResources() {
+        return this;
     }
 }

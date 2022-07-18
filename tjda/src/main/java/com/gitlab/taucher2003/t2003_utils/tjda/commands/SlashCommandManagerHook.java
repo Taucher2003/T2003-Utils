@@ -4,6 +4,7 @@ import com.gitlab.taucher2003.t2003_utils.tjda.theme.Theme;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
+import net.dv8tion.jda.api.interactions.commands.localization.LocalizationFunction;
 
 public interface SlashCommandManagerHook {
 
@@ -17,6 +18,10 @@ public interface SlashCommandManagerHook {
 
     default Permissible getGlobalPermissible() {
         return (context) -> true;
+    }
+
+    default LocalizationFunction getLocalizationFunction() {
+        return null;
     }
 
     default void handleUnpermitted(IReplyCallback interaction, Theme theme) {

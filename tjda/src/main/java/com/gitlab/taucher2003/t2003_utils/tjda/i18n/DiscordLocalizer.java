@@ -4,11 +4,17 @@ import com.gitlab.taucher2003.t2003_utils.common.i18n.ContextLocalizer;
 import com.gitlab.taucher2003.t2003_utils.common.i18n.DefaultContextLocalizer;
 import com.gitlab.taucher2003.t2003_utils.common.i18n.Localizer;
 import com.gitlab.taucher2003.t2003_utils.common.i18n.Replacement;
+import com.gitlab.taucher2003.t2003_utils.tjda.commands.PrefixedLocalizationFunction;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildChannel;
 import net.dv8tion.jda.api.entities.GuildMessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.DiscordLocale;
 import net.dv8tion.jda.api.interactions.Interaction;
+import net.dv8tion.jda.api.interactions.commands.localization.LocalizationFunction;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Map;
 
 /**
  * An extended interface of {@link Localizer} providing convenience methods for localizing from specific JDA entities.
@@ -17,7 +23,7 @@ import net.dv8tion.jda.api.interactions.Interaction;
  * @see DefaultContextLocalizer
  * @see DiscordGuildLocalizer
  */
-public interface DiscordLocalizer extends ContextLocalizer<Guild> {
+public interface DiscordLocalizer extends ContextLocalizer<Guild>, LocalizationFunction {
 
     /**
      * Localize a message from a given key and a {@link Guild} to resolve the {@link java.util.Locale} from
@@ -148,5 +154,11 @@ public interface DiscordLocalizer extends ContextLocalizer<Guild> {
      */
     default String localize(String key, GuildChannel channel, Replacement... replacements) {
         return localize(key, channel.getGuild(), replacements);
+    }
+
+    @NotNull
+    @Override
+    default Map<DiscordLocale, String> apply(@NotNull String localizationKey) {
+        return new PrefixedLocalizationFunction(this).apply(localizationKey);
     }
 }

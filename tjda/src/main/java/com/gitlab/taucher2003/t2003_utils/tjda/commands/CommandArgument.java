@@ -11,6 +11,10 @@ public class CommandArgument {
     private final boolean required;
     private final boolean autocomplete;
 
+    public CommandArgument(OptionType type, String name, String description) {
+        this(type, name, description, false);
+    }
+
     public CommandArgument(OptionType type, String name, String description, boolean required) {
         this(type, name, description, required, false);
     }
