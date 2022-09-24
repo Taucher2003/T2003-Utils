@@ -1,10 +1,8 @@
 package com.gitlab.taucher2003.t2003_utils.support;
 
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.exceptions.RateLimitedException;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.interactions.AutoCompleteCallbackAction;
 import net.dv8tion.jda.api.requests.restaction.interactions.InteractionCallbackAction;
 import org.jetbrains.annotations.NotNull;
@@ -38,9 +36,8 @@ public class AutoCompleteCallbackActionMock implements AutoCompleteCallbackActio
         return null;
     }
 
-    @NotNull
     @Override
-    public RestAction<Void> setCheck(@Nullable BooleanSupplier checks) {
+    public AutoCompleteCallbackAction setCheck(@Nullable BooleanSupplier checks) {
         return null;
     }
 
@@ -50,7 +47,7 @@ public class AutoCompleteCallbackActionMock implements AutoCompleteCallbackActio
     }
 
     @Override
-    public Void complete(boolean shouldQueue) throws RateLimitedException {
+    public Void complete(boolean shouldQueue) {
         executeTimes.incrementAndGet();
         return null;
     }
