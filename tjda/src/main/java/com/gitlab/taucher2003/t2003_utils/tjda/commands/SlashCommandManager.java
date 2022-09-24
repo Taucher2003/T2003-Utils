@@ -19,27 +19,25 @@ public class SlashCommandManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SlashCommandManager.class);
 
-    private final ShardManager shardManager;
     private final ThemeProvider themeProvider;
     private final SlashCommandManagerHook hook;
     private final Collection<Command> commands = new ArrayList<>();
 
-    public SlashCommandManager(ShardManager shardManager, Theme theme) {
-        this(shardManager, () -> theme);
+    public SlashCommandManager(Theme theme) {
+        this(() -> theme);
     }
 
-    public SlashCommandManager(ShardManager shardManager, ThemeProvider themeProvider) {
+    public SlashCommandManager(ThemeProvider themeProvider) {
         //noinspection AnonymousInnerClass
-        this(shardManager, themeProvider, new SlashCommandManagerHook() {});
+        this(themeProvider, new SlashCommandManagerHook() {});
     }
 
-    public SlashCommandManager(ShardManager shardManager, ThemeProvider themeProvider, SlashCommandManagerHook hook) {
-        this.shardManager = shardManager;
+    public SlashCommandManager(ThemeProvider themeProvider, SlashCommandManagerHook hook) {
         this.themeProvider = themeProvider;
         this.hook = hook;
     }
 
-    public void updateCommands() {
+    public void updateCommands(ShardManager shardManager) {
         shardManager.getGuildCache().forEach(this::updateCommands);
     }
 

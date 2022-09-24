@@ -21,7 +21,7 @@ import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
 class SlashCommandManagerTest {
 
-    SlashCommandManager manager = new SlashCommandManager(null, new MonokaiTheme());
+    SlashCommandManager manager = new SlashCommandManager(new MonokaiTheme());
 
     @Test
     void dispatch() {
@@ -162,7 +162,7 @@ class SlashCommandManagerTest {
                 return context -> false;
             }
         };
-        var localManager = new SlashCommandManager(null, MonokaiTheme::new, hook);
+        var localManager = new SlashCommandManager(MonokaiTheme::new, hook);
         var dummyCommand = new DummyCommand("dummy");
         localManager.registerCommand(dummyCommand);
 
@@ -178,7 +178,7 @@ class SlashCommandManagerTest {
     @Test
     void unpermittedCallsHookSubcommand() {
         var hook = new SlashCommandManagerHookMock();
-        var localManager = new SlashCommandManager(null, MonokaiTheme::new, hook);
+        var localManager = new SlashCommandManager(MonokaiTheme::new, hook);
         var dummyCommand = new DummyCommand("dummy", new DummySubCommand[]{new DummySubCommand("dummy-sub", context -> false)});
         localManager.registerCommand(dummyCommand);
 
@@ -200,7 +200,7 @@ class SlashCommandManagerTest {
                 return context -> false;
             }
         };
-        var localManager = new SlashCommandManager(null, MonokaiTheme::new, hook);
+        var localManager = new SlashCommandManager(MonokaiTheme::new, hook);
         var dummyCommand = new DummyCommand("dummy");
         localManager.registerCommand(dummyCommand);
 
