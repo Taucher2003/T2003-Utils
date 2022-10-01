@@ -41,6 +41,10 @@ public class SlashCommandManager {
         shardManager.getGuildCache().forEach(this::updateCommands);
     }
 
+    public void upsertCommands(ShardManager shardManager) {
+        shardManager.getGuildCache().forEach(this::upsertCommands);
+    }
+
     public void updateCommands(Guild guild) {
         if (!hook.useSlashCommands(guild)) {
             LOGGER.info("Deleting commands for {}/{} due to {} hook", guild.getName(), guild.getId(), hook.getClass().getCanonicalName());
@@ -55,6 +59,23 @@ public class SlashCommandManager {
                 .queue(
                         commandList -> LOGGER.info("Updated {} commands for {}/{}", commandList.size(), guild.getName(), guild.getId()),
                         throwable -> LOGGER.error("Failed to update commands for {}/{}", guild.getName(), guild.getId(), throwable)
+                );
+    }
+
+    public void upsertCommands(Guild guild) {
+        if (!hook.useSlashCommands(guild)) {
+            LOGGER.info("Commands for {}/{} are disabled with {} hook, skipping upsert", guild.getName(), guild.getId(), hook.getClass().getCanonicalName());
+            return;
+        }
+
+        LOGGER.info("Upserting commands for {}/{}", guild.getName(), guild.getId());
+        commands.stream()
+                .map(command -> command.asJdaObject(hook.getLocalizationFunction()))
+                .map(guild::upsertCommand)
+                .forEach(action -> action.queue(
+                                ignored -> LOGGER.info("Upserted command {} for {}/{}", ignored.getName(), guild.getName(), guild.getId()),
+                                throwable -> LOGGER.error("Failed to upsert command for {}/{}", guild.getName(), guild.getId(), throwable)
+                        )
                 );
     }
 
