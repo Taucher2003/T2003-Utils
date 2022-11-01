@@ -1,5 +1,7 @@
 package com.gitlab.taucher2003.t2003_utils.common.i18n;
 
+import com.gitlab.taucher2003.t2003_utils.common.i18n.provider.LocaleBundleProvider;
+
 import java.util.Locale;
 import java.util.function.Function;
 
@@ -23,9 +25,23 @@ public class DefaultContextLocalizer<T> extends DefaultLocalizer implements Cont
      *
      * @param bundleName     the name of the {@link java.util.ResourceBundle} to use
      * @param localeResolver a {@link Function} which resolves the generic type T to a {@link Locale}
+     * @deprecated use the constructor with {@link LocaleBundleProvider} instead
      */
+    @Deprecated
     public DefaultContextLocalizer(String bundleName, Function<T, Locale> localeResolver) {
         super(bundleName);
+        this.localeResolver = localeResolver;
+    }
+
+    /**
+     * Creates a new ContextLocalizer.
+     * The ContextLocalizer allows using a generic type T to resolve a {@link Locale}
+     *
+     * @param localeBundleProvider the locale bundle provider to use
+     * @param localeResolver       a {@link Function} which resolves the generic type T to a {@link Locale}
+     */
+    public DefaultContextLocalizer(LocaleBundleProvider localeBundleProvider, Function<T, Locale> localeResolver) {
+        super(localeBundleProvider);
         this.localeResolver = localeResolver;
     }
 
