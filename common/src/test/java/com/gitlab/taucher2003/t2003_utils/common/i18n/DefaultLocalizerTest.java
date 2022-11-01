@@ -3,6 +3,7 @@ package com.gitlab.taucher2003.t2003_utils.common.i18n;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import com.gitlab.taucher2003.t2003_utils.common.i18n.provider.ResourceBundleProvider;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.Test;
@@ -15,7 +16,7 @@ import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
 class DefaultLocalizerTest {
 
-    DefaultLocalizer localizer = new DefaultLocalizer("i18n.default");
+    DefaultLocalizer localizer = new DefaultLocalizer(new ResourceBundleProvider("i18n.default"));
 
     @Test
     void localizeBasic() {
@@ -62,7 +63,7 @@ class DefaultLocalizerTest {
 
         Assertions.assertThat(appender.list)
                 .extracting(ILoggingEvent::getFormattedMessage, ILoggingEvent::getLevel)
-                .containsExactly(Tuple.tuple("Tried to lookup 'key.does.not.exist' which does not exist in bundle 'i18n.default'", Level.ERROR));
+                .containsExactly(Tuple.tuple("Tried to lookup 'key.does.not.exist' which does not exist in 'ResourceBundleProvider{bundleName='i18n.default'}'", Level.ERROR));
     }
 
     @Test

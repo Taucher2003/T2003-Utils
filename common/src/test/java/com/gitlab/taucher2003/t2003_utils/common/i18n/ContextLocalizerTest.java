@@ -1,5 +1,6 @@
 package com.gitlab.taucher2003.t2003_utils.common.i18n;
 
+import com.gitlab.taucher2003.t2003_utils.common.i18n.provider.ResourceBundleProvider;
 import org.junit.jupiter.api.Test;
 
 import java.util.Locale;
@@ -14,7 +15,7 @@ class ContextLocalizerTest {
             2, Locale.GERMANY,
             3, Locale.US
     );
-    ContextLocalizer<Integer> localizer = new DefaultContextLocalizer<>("i18n.default", locales::get);
+    ContextLocalizer<Integer> localizer = new DefaultContextLocalizer<>(new ResourceBundleProvider("i18n.default"), locales::get);
 
     @Test
     void getLocale() {

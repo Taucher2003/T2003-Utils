@@ -3,6 +3,7 @@ package com.gitlab.taucher2003.t2003_utils.tjda.i18n;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import com.gitlab.taucher2003.t2003_utils.common.i18n.provider.ResourceBundleProvider;
 import com.gitlab.taucher2003.t2003_utils.tjda.commands.Command;
 import com.gitlab.taucher2003.t2003_utils.tjda.commands.CommandArgument;
 import com.gitlab.taucher2003.t2003_utils.tjda.commands.Permissible;
@@ -27,7 +28,7 @@ import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
 class DiscordLocalizerTest {
 
-    DiscordLocalizer localizer = new DiscordGuildLocalizer("i18n.discordLocale", null);
+    DiscordLocalizer localizer = new DiscordGuildLocalizer(new ResourceBundleProvider("i18n.discordLocale"), null);
     Command command = new TestCommand();
 
     @Test

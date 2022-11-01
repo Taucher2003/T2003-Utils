@@ -1,5 +1,7 @@
 package com.gitlab.taucher2003.t2003_utils.common.i18n;
 
+import com.gitlab.taucher2003.t2003_utils.common.i18n.provider.LocaleBundleProvider;
+import com.gitlab.taucher2003.t2003_utils.common.i18n.provider.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,15 +25,27 @@ public class DefaultLocalizer implements Localizer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultLocalizer.class);
 
-    private final String bundleName;
+    private final LocaleBundleProvider localeBundleProvider;
 
     /**
      * Creates a new DefaultLocalizer with a given bundle name.
      *
      * @param bundleName the name of the {@link ResourceBundle} to use
+     * @deprecated use the constructor with {@link LocaleBundleProvider} instead
      */
+    @Deprecated
     public DefaultLocalizer(String bundleName) {
-        this.bundleName = bundleName;
+        this(new ResourceBundleProvider(bundleName));
+    }
+
+    /**
+     * Creates a new DefaultLocalizer with a given {@link LocaleBundleProvider}
+     *
+     * @param provider the locale bundle provider to use
+     * @see LocaleBundleProvider
+     */
+    public DefaultLocalizer(LocaleBundleProvider provider) {
+        this.localeBundleProvider = provider;
     }
 
     @Override
@@ -42,24 +56,20 @@ public class DefaultLocalizer implements Localizer {
         }
 
         LOGGER.trace("Localizing '{}' for '{}'", key, Locale.ROOT.equals(locale) ? "ROOT" : locale.toString());
-        var bundle = getBundle(locale);
+        var bundle = localeBundleProvider.getBundle(locale);
         var expandedMessage = resolveNestedStrings(key, bundle::getString, bundle::containsKey, new HashSet<>());
         return applyReplacements(expandedMessage, replacements);
     }
 
     @Override
     public boolean keyExists(String key, Locale locale) {
-        return getBundle(locale).containsKey(key);
-    }
-
-    protected ResourceBundle getBundle(Locale locale) {
-        return ResourceBundle.getBundle(bundleName, locale, DefaultLocalizerControl.SINGLETON);
+        return localeBundleProvider.getBundle(locale).containsKey(key);
     }
 
     protected String resolveNestedStrings(String key, Function<String, String> messageResolver, Predicate<String> messageExistsPredicate, Set<String> visitedNodes) {
-        LOGGER.debug("Looking up '{}' in bundle '{}'", key, bundleName);
+        LOGGER.debug("Looking up '{}' in '{}'", key, localeBundleProvider);
         if (!messageExistsPredicate.test(key)) {
-            LOGGER.error("Tried to lookup '{}' which does not exist in bundle '{}'", key, bundleName);
+            LOGGER.error("Tried to lookup '{}' which does not exist in '{}'", key, localeBundleProvider);
             return key;
         }
         visitedNodes.add(key);
@@ -105,15 +115,5 @@ public class DefaultLocalizer implements Localizer {
             result = replacement.apply(result);
         }
         return result;
-    }
-
-    private static final class DefaultLocalizerControl extends ResourceBundle.Control {
-
-        private static final DefaultLocalizerControl SINGLETON = new DefaultLocalizerControl();
-
-        @Override
-        public Locale getFallbackLocale(String baseName, Locale locale) {
-            return Locale.ROOT;
-        }
     }
 }
