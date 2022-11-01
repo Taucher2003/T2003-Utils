@@ -42,6 +42,7 @@ public class DefaultLocalizer implements Localizer {
      * Creates a new DefaultLocalizer with a given {@link LocaleBundleProvider}
      *
      * @param provider the locale bundle provider to use
+     * @see LocaleBundleProvider
      */
     public DefaultLocalizer(LocaleBundleProvider provider) {
         this.localeBundleProvider = provider;

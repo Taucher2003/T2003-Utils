@@ -7,13 +7,18 @@ public class ResourceBundleProvider implements LocaleBundleProvider {
 
     private final String bundleName;
 
+    /**
+     * Creates a {@link LocaleBundleProvider} for a {@link ResourceBundle} with a given name
+     *
+     * @param bundleName the name of the {@link ResourceBundle} to use
+     */
     public ResourceBundleProvider(String bundleName) {
         this.bundleName = bundleName;
     }
 
     @Override
     public LocaleBundle getBundle(Locale locale) {
-        return new ResourceBundleBundle(ResourceBundle.getBundle(bundleName, locale, DefaultLocalizerControl.SINGLETON));
+        return new LocaleResourceBundle(ResourceBundle.getBundle(bundleName, locale, DefaultLocalizerControl.SINGLETON));
     }
 
     @Override
@@ -23,11 +28,11 @@ public class ResourceBundleProvider implements LocaleBundleProvider {
                 '}';
     }
 
-    private static final class ResourceBundleBundle implements LocaleBundle {
+    private static final class LocaleResourceBundle implements LocaleBundle {
 
         private final ResourceBundle resourceBundle;
 
-        private ResourceBundleBundle(ResourceBundle resourceBundle) {
+        private LocaleResourceBundle(ResourceBundle resourceBundle) {
             this.resourceBundle = resourceBundle;
         }
 
