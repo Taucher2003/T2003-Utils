@@ -1,25 +1,25 @@
 package com.gitlab.taucher2003.t2003_utils.tjda.commands;
 
+import com.gitlab.taucher2003.t2003_utils.tjda.commands.build.meta.CommandMetaBuilder;
+import com.gitlab.taucher2003.t2003_utils.tjda.commands.build.meta.SubCommandGroupableMeta;
 import com.gitlab.taucher2003.t2003_utils.tjda.theme.Theme;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.interactions.commands.CommandAutoCompleteInteraction;
 import net.dv8tion.jda.api.interactions.commands.CommandInteraction;
-import net.dv8tion.jda.api.interactions.commands.CommandInteractionPayload;
-import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.localization.LocalizationFunction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.function.Function;
 
-public abstract class Command {
+public abstract class Command implements Routable, CommandMixin {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Command.class);
 
     protected static final Permissible UNRESTRICTED = (context) -> true;
 
@@ -38,11 +38,7 @@ public abstract class Command {
         }
     };
 
-    private final String name;
-    private final String description;
-    private final Collection<SubCommand> subCommands;
-    private final Collection<CommandArgument> arguments;
-    private final Permissible permissible;
+    private final SubCommandGroupableMeta meta;
 
     protected Command(String name, String description) {
         this(name, description, new SubCommand[0], new CommandArgument[0], UNRESTRICTED);
@@ -69,38 +65,35 @@ public abstract class Command {
     }
 
     private Command(String name, String description, SubCommand[] subCommands, CommandArgument[] arguments, Permissible permissible) {
-        this.name = name;
-        this.description = description;
-        this.subCommands = Arrays.asList(subCommands);
-        this.arguments = Arrays.asList(arguments);
-        this.permissible = permissible;
+        this(
+                new CommandMetaBuilder(name, description)
+                        .setSubCommands(Arrays.asList(subCommands))
+                        .setArguments(Arrays.asList(arguments))
+                        .setPermissible(permissible)
+                        .build()
+        );
+    }
+
+    protected Command(SubCommandGroupableMeta meta) {
+        this.meta = meta;
     }
 
     public CommandData asJdaObject(LocalizationFunction localizationFunction) {
-        var data = Commands.slash(name, description);
-        if (!subCommands.isEmpty()) {
-            data.addSubcommands(subCommands.stream().map(SubCommand::asJdaObject).collect(Collectors.toList()));
-        }
-        if (!arguments.isEmpty()) {
-            data.addOptions(arguments.stream().map(CommandArgument::asJdaObject).collect(Collectors.toList()));
-        }
+        var data = Commands.slash(meta.getName(), meta.getDescription());
+        meta.getConfigurator().accept(data);
         if (localizationFunction != null) {
             data.setLocalizationFunction(localizationFunction);
         }
-        data.setDefaultPermissions(DefaultMemberPermissions.enabledFor(permissible.defaultMemberPermissions()));
         return data;
     }
 
+    @Override
     public String name() {
-        return name;
+        return meta.getName();
     }
 
-    public Permissible permissible() {
-        return permissible;
-    }
-
-    public Collection<SubCommand> subCommands() {
-        return subCommands;
+    public SubCommandGroupableMeta meta() {
+        return meta;
     }
 
     public abstract void execute(CommandInteraction event, Theme theme, Permissible.PermissibleContext permissibleContext);
@@ -109,15 +102,111 @@ public abstract class Command {
     public void autocomplete(CommandAutoCompleteInteraction event, Permissible.PermissibleContext permissibleContext) {
     }
 
-    protected OptionMapping findOption(CommandInteractionPayload event, String name) {
-        return event.getOption(name);
+    @Override
+    public void doExecuteRouting(CommandInteraction event, Theme theme, Permissible.PermissibleContext permissibleContext,
+                                 Function<Permissible, Permissible> permissibleCreator, SlashCommandManagerHook hook) {
+        var permissible = permissibleCreator.apply(meta.getPermissible());
+        if (!permissible.permitted(permissibleContext)) {
+            hook.handleUnpermitted(event, theme);
+            return;
+        }
+
+        var path = event.getCommandPath().split("/");
+
+        if (path.length == 1) {
+            execute(event, theme, permissibleContext);
+            return;
+        }
+
+        if (path.length == 2) {
+            meta.getSubCommands()
+                    .stream()
+                    .filter(command -> command.name().equals(path[1]))
+                    .findFirst()
+                    .ifPresentOrElse(
+                            command -> {
+                                var innerPermissible = permissibleCreator.apply(command.meta().getPermissible());
+                                if (!innerPermissible.permitted(permissibleContext)) {
+                                    hook.handleUnpermitted(event, theme);
+                                    return;
+                                }
+
+                                command.execute(event, theme, permissibleContext);
+                            },
+                            () -> LOGGER.warn("Received interaction for unknown sub-command {}", event.getCommandPath())
+                    );
+            return;
+        }
+
+        meta.getCommandGroups()
+                .stream()
+                .filter(group -> group.name().equals(path[1]))
+                .findFirst()
+                .ifPresentOrElse(
+                        group -> {
+                            var innerPermissible = permissibleCreator.apply(group.meta().getPermissible());
+                            if (!innerPermissible.permitted(permissibleContext)) {
+                                hook.handleUnpermitted(event, theme);
+                                return;
+                            }
+
+                            group.doExecuteRouting(event, theme, permissibleContext, permissibleCreator, hook);
+                        },
+                        () -> LOGGER.warn("Received interaction for unknown sub-group {}", event.getCommandPath())
+                );
     }
 
-    protected Optional<OptionMapping> findOptionOpt(CommandInteractionPayload event, String name) {
-        return Optional.ofNullable(event.getOption(name));
-    }
+    @Override
+    public void doAutocompleteRouting(CommandAutoCompleteInteraction event, Permissible.PermissibleContext permissibleContext,
+                                      Function<Permissible, Permissible> permissibleCreator) {
+        var permissible = permissibleCreator.apply(meta.getPermissible());
+        if (!permissible.permitted(permissibleContext)) {
+            event.replyChoices(Collections.emptyList()).queue();
+            return;
+        }
 
-    protected void replyError(MessageEmbed embed, IReplyCallback interaction) {
-        interaction.deferReply(true).flatMap(hook -> hook.editOriginalEmbeds(embed)).queue();
+        var path = event.getCommandPath().split("/");
+
+        if (path.length == 1) {
+            autocomplete(event, permissibleContext);
+            return;
+        }
+
+        if (path.length == 2) {
+            meta.getSubCommands()
+                    .stream()
+                    .filter(command -> command.name().equals(path[1]))
+                    .findFirst()
+                    .ifPresentOrElse(
+                            command -> {
+                                var innerPermissible = permissibleCreator.apply(command.meta().getPermissible());
+                                if (!innerPermissible.permitted(permissibleContext)) {
+                                    event.replyChoices(Collections.emptyList()).queue();
+                                    return;
+                                }
+
+                                command.autocomplete(event, permissibleContext);
+                            },
+                            () -> LOGGER.warn("Received autocomplete for unknown sub-command {}", event.getCommandPath())
+                    );
+            return;
+        }
+
+        meta.getCommandGroups()
+                .stream()
+                .filter(group -> group.name().equals(path[1]))
+                .findFirst()
+                .ifPresentOrElse(
+                        group -> {
+                            var innerPermissible = permissibleCreator.apply(group.meta().getPermissible());
+                            if (!innerPermissible.permitted(permissibleContext)) {
+                                event.replyChoices(Collections.emptyList()).queue();
+                                return;
+                            }
+
+                            group.doAutocompleteRouting(event, permissibleContext, permissibleCreator);
+                        },
+                        () -> LOGGER.warn("Received autocomplete for unknown sub-group {}", event.getCommandPath())
+                );
     }
 }
