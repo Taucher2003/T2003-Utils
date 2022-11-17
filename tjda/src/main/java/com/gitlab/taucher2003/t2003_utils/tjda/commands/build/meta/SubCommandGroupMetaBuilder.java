@@ -14,7 +14,7 @@ public class SubCommandGroupMetaBuilder {
     private final String description;
     private final Collection<SubCommand> subCommands = new ArrayList<>();
 
-    private Permissible permissible;
+    private Permissible permissible = Permissible.UNRESTRICTED;
 
     public SubCommandGroupMetaBuilder(String name, String description) {
         this.name = name;

@@ -3,7 +3,6 @@ package com.gitlab.taucher2003.t2003_utils.tjda.commands;
 import com.gitlab.taucher2003.t2003_utils.tjda.commands.build.meta.CommandMetaBuilder;
 import com.gitlab.taucher2003.t2003_utils.tjda.commands.build.meta.SubCommandGroupableMeta;
 import com.gitlab.taucher2003.t2003_utils.tjda.theme.Theme;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.interactions.commands.CommandAutoCompleteInteraction;
 import net.dv8tion.jda.api.interactions.commands.CommandInteraction;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -14,59 +13,49 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.function.Function;
+
+import static com.gitlab.taucher2003.t2003_utils.tjda.commands.Permissible.UNRESTRICTED;
 
 public abstract class Command implements Routable, CommandMixin {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Command.class);
 
-    protected static final Permissible UNRESTRICTED = (context) -> true;
-
-    @SuppressWarnings("AnonymousInnerClass")
-    protected static final Permissible ADMINISTRATOR_ONLY = new Permissible() {
-        @Override
-        public List<Permission> defaultMemberPermissions() {
-            return List.of(Permission.ADMINISTRATOR);
-        }
-
-        @Override
-        public boolean permitted(PermissibleContext context) {
-            return context.getMember()
-                    .map(m -> m.hasPermission(Permission.ADMINISTRATOR))
-                    .orElse(false);
-        }
-    };
-
     private final SubCommandGroupableMeta meta;
 
+    @Deprecated
     protected Command(String name, String description) {
         this(name, description, new SubCommand[0], new CommandArgument[0], UNRESTRICTED);
     }
 
+    @Deprecated
     protected Command(String name, String description, Permissible permissible) {
         this(name, description, new SubCommand[0], new CommandArgument[0], permissible);
     }
 
+    @Deprecated
     protected Command(String name, String description, CommandArgument[] arguments) {
         this(name, description, arguments, UNRESTRICTED);
     }
 
+    @Deprecated
     protected Command(String name, String description, CommandArgument[] arguments, Permissible permissible) {
         this(name, description, new SubCommand[0], arguments, permissible);
     }
 
+    @Deprecated
     protected Command(String name, String description, SubCommand[] subCommands) {
         this(name, description, subCommands, UNRESTRICTED);
     }
 
+    @Deprecated
     protected Command(String name, String description, SubCommand[] subCommands, Permissible permissible) {
         this(name, description, subCommands, new CommandArgument[0], permissible);
     }
 
     private Command(String name, String description, SubCommand[] subCommands, CommandArgument[] arguments, Permissible permissible) {
         this(
-                new CommandMetaBuilder(name, description)
+                createMeta(name, description)
                         .setSubCommands(Arrays.asList(subCommands))
                         .setArguments(Arrays.asList(arguments))
                         .setPermissible(permissible)
@@ -208,5 +197,9 @@ public abstract class Command implements Routable, CommandMixin {
                         },
                         () -> LOGGER.warn("Received autocomplete for unknown sub-group {}", event.getCommandPath())
                 );
+    }
+
+    public static CommandMetaBuilder createMeta(String name, String description) {
+        return new CommandMetaBuilder(name, description);
     }
 }

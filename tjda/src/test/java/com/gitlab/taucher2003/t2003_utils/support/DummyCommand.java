@@ -7,6 +7,7 @@ import com.gitlab.taucher2003.t2003_utils.tjda.theme.Theme;
 import net.dv8tion.jda.api.interactions.commands.CommandAutoCompleteInteraction;
 import net.dv8tion.jda.api.interactions.commands.CommandInteraction;
 
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class DummyCommand extends Command {
@@ -15,11 +16,11 @@ public class DummyCommand extends Command {
     private final AtomicInteger autocompleteTimes = new AtomicInteger();
 
     public DummyCommand(String name) {
-        super(name, "");
+        super(createMeta(name, "").build());
     }
 
     public DummyCommand(String name, SubCommand[] subCommands) {
-        super(name, "", subCommands);
+        super(createMeta(name, "").setSubCommands(Arrays.asList(subCommands)).build());
     }
 
     @Override

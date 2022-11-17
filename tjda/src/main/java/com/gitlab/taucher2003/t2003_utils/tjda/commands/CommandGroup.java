@@ -1,5 +1,6 @@
 package com.gitlab.taucher2003.t2003_utils.tjda.commands;
 
+import com.gitlab.taucher2003.t2003_utils.tjda.commands.build.meta.SubCommandGroupMetaBuilder;
 import com.gitlab.taucher2003.t2003_utils.tjda.commands.build.meta.SubCommandableMeta;
 import com.gitlab.taucher2003.t2003_utils.tjda.theme.Theme;
 import net.dv8tion.jda.api.interactions.commands.CommandAutoCompleteInteraction;
@@ -80,5 +81,9 @@ public class CommandGroup implements Routable {
                         },
                         () -> LOGGER.warn("Received autocomplete for unknown sub-command {}", event.getCommandPath())
                 );
+    }
+
+    public static SubCommandGroupMetaBuilder createMeta(String name, String description) {
+        return new SubCommandGroupMetaBuilder(name, description);
     }
 }

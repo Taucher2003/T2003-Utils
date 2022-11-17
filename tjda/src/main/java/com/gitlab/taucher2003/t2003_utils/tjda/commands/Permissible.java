@@ -13,6 +13,23 @@ import java.util.Optional;
 @FunctionalInterface
 public interface Permissible {
 
+    Permissible UNRESTRICTED = (context) -> true;
+
+    @SuppressWarnings("AnonymousInnerClass")
+    Permissible ADMINISTRATOR_ONLY = new Permissible() {
+        @Override
+        public List<Permission> defaultMemberPermissions() {
+            return List.of(Permission.ADMINISTRATOR);
+        }
+
+        @Override
+        public boolean permitted(PermissibleContext context) {
+            return context.getMember()
+                    .map(m -> m.hasPermission(Permission.ADMINISTRATOR))
+                    .orElse(false);
+        }
+    };
+
     boolean permitted(PermissibleContext context);
 
     default List<Permission> defaultMemberPermissions() {

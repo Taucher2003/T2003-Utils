@@ -19,7 +19,7 @@ public class CommandMetaBuilder {
     private final Collection<CommandArgument> arguments = new ArrayList<>();
     private final Collection<CommandGroup> groups = new ArrayList<>();
     private final Collection<SubCommand> subCommands = new ArrayList<>();
-    private Permissible permissible;
+    private Permissible permissible = Permissible.UNRESTRICTED;
 
     public CommandMetaBuilder(String name, String description) {
         this.name = name;

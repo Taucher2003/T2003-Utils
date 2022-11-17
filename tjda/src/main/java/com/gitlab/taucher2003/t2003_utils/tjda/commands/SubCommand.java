@@ -9,6 +9,8 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 import java.util.Arrays;
 
+import static com.gitlab.taucher2003.t2003_utils.tjda.commands.Permissible.UNRESTRICTED;
+
 public abstract class SubCommand implements CommandMixin {
 
     private final CommandMeta<SubcommandData> meta;
@@ -20,7 +22,7 @@ public abstract class SubCommand implements CommandMixin {
 
     @Deprecated
     protected SubCommand(String name, String description, CommandArgument[] arguments) {
-        this(name, description, arguments, Command.UNRESTRICTED);
+        this(name, description, arguments, UNRESTRICTED);
     }
 
     @Deprecated
@@ -31,7 +33,7 @@ public abstract class SubCommand implements CommandMixin {
     @Deprecated
     protected SubCommand(String name, String description, CommandArgument[] arguments, Permissible permissible) {
         this(
-                new SubCommandMetaBuilder(name, description)
+                createMeta(name, description)
                         .setArguments(Arrays.asList(arguments))
                         .setPermissible(permissible)
                         .build()
@@ -60,5 +62,9 @@ public abstract class SubCommand implements CommandMixin {
 
     // can be overridden
     public void autocomplete(CommandAutoCompleteInteraction event, Permissible.PermissibleContext permissibleContext) {
+    }
+
+    public static SubCommandMetaBuilder createMeta(String name, String description) {
+        return new SubCommandMetaBuilder(name, description);
     }
 }

@@ -11,7 +11,6 @@ import com.gitlab.taucher2003.t2003_utils.tjda.commands.SubCommand;
 import com.gitlab.taucher2003.t2003_utils.tjda.theme.Theme;
 import net.dv8tion.jda.api.interactions.DiscordLocale;
 import net.dv8tion.jda.api.interactions.commands.CommandInteraction;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
@@ -79,9 +78,9 @@ class DiscordLocalizerTest {
 
         private TestCommand() {
             super(
-                    "test",
-                    "test-description",
-                    new SubCommand[]{new TestSubCommand()}
+                    createMeta("test", "test-description")
+                            .setSubCommands(List.of(new TestSubCommand()))
+                            .build()
             );
         }
 
@@ -94,9 +93,9 @@ class DiscordLocalizerTest {
 
         private TestSubCommand() {
             super(
-                    "test-sub",
-                    "test-sub-description",
-                    new CommandArgument[]{new CommandArgument(OptionType.STRING, "test-sub-arg", "test-sub-arg-description")}
+                    createMeta("test-sub", "test-sub-description")
+                            .addArgument(CommandArgument.text("test-sub-arg", "test-sub-arg-description").build())
+                            .build()
             );
         }
 
