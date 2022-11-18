@@ -18,11 +18,13 @@ public final class InteractionMocker {
     static <T extends CommandInteractionPayload> T commandInteractionPayload(
             Class<T> clazz,
             String name,
+            String groupName,
             String subcommandName
     ) {
         var interaction = mock(clazz);
 
         when(interaction.getName()).thenReturn(name);
+        when(interaction.getSubcommandGroup()).thenReturn(groupName);
         when(interaction.getSubcommandName()).thenReturn(subcommandName);
         when(interaction.getCommandType()).thenReturn(Command.Type.SLASH);
         when(interaction.getCommandPath()).thenCallRealMethod();
@@ -50,6 +52,7 @@ public final class InteractionMocker {
 
         private final Class<? extends T> clazz;
         private String name;
+        private String groupName;
         private String subcommandName;
 
         public CommandInteractionPayloadMockBuilder(Class<? extends T> clazz) {
@@ -58,6 +61,11 @@ public final class InteractionMocker {
 
         public CommandInteractionPayloadMockBuilder<T> setName(String name) {
             this.name = name;
+            return this;
+        }
+
+        public CommandInteractionPayloadMockBuilder<T> setGroupName(String groupName) {
+            this.groupName = groupName;
             return this;
         }
 
@@ -70,6 +78,7 @@ public final class InteractionMocker {
             return commandInteractionPayload(
                     clazz,
                     name,
+                    groupName,
                     subcommandName
             );
         }

@@ -108,6 +108,46 @@ class SlashCommandManagerTest {
     }
 
     @Test
+    void dispatchGroupSubcommand() {
+        var dummySubCommand = new DummySubCommand("dummy-sub");
+        var dummyCommandGroup = new CommandGroup(CommandGroup.createMeta("dummy-group", "")
+                .addSubCommand(dummySubCommand)
+                .build());
+        var dummyCommand = registeredCommand("dummy", dummyCommandGroup);
+
+        var interaction = InteractionMocker.commandInteraction()
+                .setName("dummy")
+                .setGroupName("dummy-group")
+                .setSubcommandName("dummy-sub")
+                .build();
+
+        manager.dispatch(interaction);
+
+        assertThat(dummyCommand.executedTimes()).isEqualTo(0);
+        assertThat(dummySubCommand.executedTimes()).isEqualTo(1);
+    }
+
+    @Test
+    void autocompleteGroupSubcommand() {
+        var dummySubCommand = new DummySubCommand("dummy-sub");
+        var dummyCommandGroup = new CommandGroup(CommandGroup.createMeta("dummy-group", "")
+                .addSubCommand(dummySubCommand)
+                .build());
+        var dummyCommand = registeredCommand("dummy", dummyCommandGroup);
+
+        var interaction = InteractionMocker.autoComplete()
+                .setName("dummy")
+                .setGroupName("dummy-group")
+                .setSubcommandName("dummy-sub")
+                .build();
+
+        manager.autocomplete(interaction);
+
+        assertThat(dummyCommand.autocompleteTimes()).isEqualTo(0);
+        assertThat(dummySubCommand.autocompleteTimes()).isEqualTo(1);
+    }
+
+    @Test
     void logsInteractionsForUnknownCommand() {
         var commandInteraction = InteractionMocker.commandInteraction()
                 .setName("dummy")
@@ -155,6 +195,60 @@ class SlashCommandManagerTest {
     }
 
     @Test
+    void logsInteractionsForUnknownGroup() {
+        registeredCommand("dummy");
+        var commandInteraction = InteractionMocker.commandInteraction()
+                .setName("dummy")
+                .setGroupName("dummy-group")
+                .setSubcommandName("dummy-sub")
+                .build();
+        var autocompleteInteraction = InteractionMocker.autoComplete()
+                .setName("dummy")
+                .setGroupName("dummy-group")
+                .setSubcommandName("dummy-sub")
+                .build();
+
+        var appender = setupAppender();
+
+        manager.dispatch(commandInteraction);
+        manager.autocomplete(autocompleteInteraction);
+
+        assertThat(appender.list)
+                .extracting(ILoggingEvent::getFormattedMessage, ILoggingEvent::getLevel)
+                .containsExactly(
+                        Tuple.tuple("Received interaction for unknown sub-group dummy/dummy-group/dummy-sub", Level.WARN),
+                        Tuple.tuple("Received autocomplete for unknown sub-group dummy/dummy-group/dummy-sub", Level.WARN)
+                );
+    }
+
+    @Test
+    void logsInteractionsForUnknownGroupSubCommand() {
+        registeredCommand("dummy", new CommandGroup(CommandGroup.createMeta("dummy-group", "").build()));
+        var commandInteraction = InteractionMocker.commandInteraction()
+                .setName("dummy")
+                .setGroupName("dummy-group")
+                .setSubcommandName("dummy-sub")
+                .build();
+        var autocompleteInteraction = InteractionMocker.autoComplete()
+                .setName("dummy")
+                .setGroupName("dummy-group")
+                .setSubcommandName("dummy-sub")
+                .build();
+
+        var appender = setupAppender();
+
+        manager.dispatch(commandInteraction);
+        manager.autocomplete(autocompleteInteraction);
+
+        assertThat(appender.list)
+                .extracting(ILoggingEvent::getFormattedMessage, ILoggingEvent::getLevel)
+                .containsExactly(
+                        Tuple.tuple("Received interaction for unknown sub-command dummy/dummy-group/dummy-sub", Level.WARN),
+                        Tuple.tuple("Received autocomplete for unknown sub-command dummy/dummy-group/dummy-sub", Level.WARN)
+                );
+    }
+
+    @Test
     void unpermittedCallsHook() {
         var hook = new SlashCommandManagerHookMock() {
             @Override
@@ -179,11 +273,34 @@ class SlashCommandManagerTest {
     void unpermittedCallsHookSubcommand() {
         var hook = new SlashCommandManagerHookMock();
         var localManager = new SlashCommandManager(MonokaiTheme::new, hook);
-        var dummyCommand = new DummyCommand("dummy", new DummySubCommand[]{new DummySubCommand("dummy-sub", context -> false)});
+        var dummyCommand = new DummyCommand("dummy", new DummySubCommand("dummy-sub", context -> false));
         localManager.registerCommand(dummyCommand);
 
         var interaction = InteractionMocker.commandInteraction()
                 .setName("dummy")
+                .setSubcommandName("dummy-sub")
+                .build();
+
+        localManager.dispatch(interaction);
+
+        assertThat(hook.unpermittedTimes()).isEqualTo(1);
+    }
+
+    @Test
+    void unpermittedCallsHookGroupSubcommand() {
+        var hook = new SlashCommandManagerHookMock();
+        var localManager = new SlashCommandManager(MonokaiTheme::new, hook);
+        var subcommand = new DummySubCommand("dummy-sub");
+        var group = new CommandGroup(CommandGroup.createMeta("dummy-group", "")
+                .addSubCommand(subcommand)
+                .setPermissible(context -> false)
+                .build());
+        var dummyCommand = new DummyCommand("dummy", group);
+        localManager.registerCommand(dummyCommand);
+
+        var interaction = InteractionMocker.commandInteraction()
+                .setName("dummy")
+                .setGroupName("dummy-group")
                 .setSubcommandName("dummy-sub")
                 .build();
 
@@ -232,6 +349,28 @@ class SlashCommandManagerTest {
         assertThat(autocompleteCallbackActionMock.executeTimes()).isEqualTo(1);
     }
 
+    @Test
+    void unpermittedReturnsEmptyChoicesGroupSubcommand() {
+        var subcommand = new DummySubCommand("dummy-sub");
+        var group = new CommandGroup(CommandGroup.createMeta("dummy-group", "")
+                .addSubCommand(subcommand)
+                .setPermissible(context -> false)
+                .build());
+        registeredCommand("dummy", group);
+
+        var interaction = InteractionMocker.autoComplete()
+                .setName("dummy")
+                .setGroupName("dummy-group")
+                .setSubcommandName("dummy-sub")
+                .build();
+        var autocompleteCallbackActionMock = (AutoCompleteCallbackActionMock) interaction.replyChoices(Collections.emptyList());
+        assertThat(autocompleteCallbackActionMock.executeTimes()).isEqualTo(0);
+
+        manager.autocomplete(interaction);
+
+        assertThat(autocompleteCallbackActionMock.executeTimes()).isEqualTo(1);
+    }
+
     @AfterEach
     void cleanup() {
         manager.unregisterAllCommands();
@@ -245,6 +384,12 @@ class SlashCommandManagerTest {
 
     DummyCommand registeredCommand(String name, SubCommand... subCommands) {
         var dummyCommand = new DummyCommand(name, subCommands);
+        manager.registerCommand(dummyCommand);
+        return dummyCommand;
+    }
+
+    DummyCommand registeredCommand(String name, CommandGroup... commandGroups) {
+        var dummyCommand = new DummyCommand(name, commandGroups);
         manager.registerCommand(dummyCommand);
         return dummyCommand;
     }

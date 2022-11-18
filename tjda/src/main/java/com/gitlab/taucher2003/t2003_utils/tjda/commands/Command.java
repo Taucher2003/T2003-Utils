@@ -1,6 +1,7 @@
 package com.gitlab.taucher2003.t2003_utils.tjda.commands;
 
 import com.gitlab.taucher2003.t2003_utils.tjda.commands.build.meta.CommandMetaBuilder;
+import com.gitlab.taucher2003.t2003_utils.tjda.commands.build.meta.RootCommandMetaBuilder;
 import com.gitlab.taucher2003.t2003_utils.tjda.commands.build.meta.SubCommandGroupableMeta;
 import com.gitlab.taucher2003.t2003_utils.tjda.theme.Theme;
 import net.dv8tion.jda.api.interactions.commands.CommandAutoCompleteInteraction;
@@ -25,12 +26,12 @@ public abstract class Command implements Routable, CommandMixin {
 
     @Deprecated
     protected Command(String name, String description) {
-        this(name, description, new SubCommand[0], new CommandArgument[0], UNRESTRICTED);
+        this(name, description, UNRESTRICTED);
     }
 
     @Deprecated
     protected Command(String name, String description, Permissible permissible) {
-        this(name, description, new SubCommand[0], new CommandArgument[0], permissible);
+        this(name, description, new CommandArgument[0], permissible);
     }
 
     @Deprecated
@@ -40,7 +41,7 @@ public abstract class Command implements Routable, CommandMixin {
 
     @Deprecated
     protected Command(String name, String description, CommandArgument[] arguments, Permissible permissible) {
-        this(name, description, new SubCommand[0], arguments, permissible);
+        this(createMeta(name, description).setArguments(Arrays.asList(arguments)).setPermissible(permissible).build());
     }
 
     @Deprecated
@@ -50,17 +51,7 @@ public abstract class Command implements Routable, CommandMixin {
 
     @Deprecated
     protected Command(String name, String description, SubCommand[] subCommands, Permissible permissible) {
-        this(name, description, subCommands, new CommandArgument[0], permissible);
-    }
-
-    private Command(String name, String description, SubCommand[] subCommands, CommandArgument[] arguments, Permissible permissible) {
-        this(
-                createMeta(name, description)
-                        .setSubCommands(Arrays.asList(subCommands))
-                        .setArguments(Arrays.asList(arguments))
-                        .setPermissible(permissible)
-                        .build()
-        );
+        this(createMeta(name, description).setSubCommands(Arrays.asList(subCommands)).setPermissible(permissible).build());
     }
 
     protected Command(SubCommandGroupableMeta meta) {
@@ -199,7 +190,7 @@ public abstract class Command implements Routable, CommandMixin {
                 );
     }
 
-    public static CommandMetaBuilder createMeta(String name, String description) {
+    public static RootCommandMetaBuilder createMeta(String name, String description) {
         return new CommandMetaBuilder(name, description);
     }
 }

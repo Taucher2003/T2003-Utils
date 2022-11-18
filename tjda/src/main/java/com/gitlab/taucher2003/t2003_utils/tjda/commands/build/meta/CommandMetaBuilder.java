@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-public class CommandMetaBuilder {
+public class CommandMetaBuilder implements RootCommandMetaBuilder {
 
     private final String name;
     private final String description;
@@ -26,39 +26,46 @@ public class CommandMetaBuilder {
         this.description = description;
     }
 
+    @Override
     public CommandMetaBuilder setArguments(Collection<CommandArgument> arguments) {
         this.arguments.clear();
         this.arguments.addAll(arguments);
         return this;
     }
 
+    @Override
     public CommandMetaBuilder addArgument(CommandArgument argument) {
         this.arguments.add(argument);
         return this;
     }
 
+    @Override
     public CommandMetaBuilder setGroups(Collection<CommandGroup> arguments) {
         this.groups.clear();
         this.groups.addAll(arguments);
         return this;
     }
 
+    @Override
     public CommandMetaBuilder addGroup(CommandGroup group) {
         this.groups.add(group);
         return this;
     }
 
-    public CommandMetaBuilder setSubCommands(Collection<SubCommand> arguments) {
+    @Override
+    public CommandMetaBuilder setSubCommands(Collection<SubCommand> subCommands) {
         this.subCommands.clear();
-        this.subCommands.addAll(arguments);
+        this.subCommands.addAll(subCommands);
         return this;
     }
 
-    public CommandMetaBuilder addSubCommand(SubCommand argument) {
-        this.subCommands.add(argument);
+    @Override
+    public CommandMetaBuilder addSubCommand(SubCommand subCommand) {
+        this.subCommands.add(subCommand);
         return this;
     }
 
+    @Override
     public CommandMetaBuilder setPermissible(Permissible permissible) {
         this.permissible = permissible;
         return this;
@@ -83,6 +90,7 @@ public class CommandMetaBuilder {
         data.setDefaultPermissions(DefaultMemberPermissions.enabledFor(permissible.defaultMemberPermissions()));
     }
 
+    @Override
     public SubCommandGroupableMeta build() {
         return new SubCommandGroupableMeta(name, description, permissible, this::configureCommand, subCommands, groups);
     }
