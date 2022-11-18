@@ -1,58 +1,61 @@
 package com.gitlab.taucher2003.t2003_utils.tjda.commands;
 
+import com.gitlab.taucher2003.t2003_utils.tjda.commands.build.meta.CommandMeta;
+import com.gitlab.taucher2003.t2003_utils.tjda.commands.build.meta.SubCommandMetaBuilder;
 import com.gitlab.taucher2003.t2003_utils.tjda.theme.Theme;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.interactions.commands.CommandAutoCompleteInteraction;
 import net.dv8tion.jda.api.interactions.commands.CommandInteraction;
-import net.dv8tion.jda.api.interactions.commands.CommandInteractionPayload;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.stream.Collectors;
 
-public abstract class SubCommand {
+import static com.gitlab.taucher2003.t2003_utils.tjda.commands.Permissible.UNRESTRICTED;
 
-    private final String name;
-    private final String description;
-    private final Collection<CommandArgument> arguments;
-    private final Permissible permissible;
+public abstract class SubCommand implements CommandMixin {
 
+    private final CommandMeta<SubcommandData> meta;
+
+    @Deprecated
     protected SubCommand(String name, String description) {
         this(name, description, new CommandArgument[0]);
     }
 
+    @Deprecated
     protected SubCommand(String name, String description, CommandArgument[] arguments) {
-        this(name, description, arguments, Command.UNRESTRICTED);
+        this(name, description, arguments, UNRESTRICTED);
     }
 
+    @Deprecated
     protected SubCommand(String name, String description, Permissible permissible) {
         this(name, description, new CommandArgument[0], permissible);
     }
 
+    @Deprecated
     protected SubCommand(String name, String description, CommandArgument[] arguments, Permissible permissible) {
-        this.name = name;
-        this.description = description;
-        this.arguments = Arrays.asList(arguments);
-        this.permissible = permissible;
+        this(
+                createMeta(name, description)
+                        .setArguments(Arrays.asList(arguments))
+                        .setPermissible(permissible)
+                        .build()
+        );
+    }
+
+    protected SubCommand(CommandMeta<SubcommandData> meta) {
+        this.meta = meta;
     }
 
     public SubcommandData asJdaObject() {
-        var data = new SubcommandData(name, description);
-        if (!arguments.isEmpty()) {
-            data.addOptions().addOptions(arguments.stream().map(CommandArgument::asJdaObject).collect(Collectors.toList()));
-        }
+        var data = new SubcommandData(meta.getName(), meta.getDescription());
+        meta.getConfigurator().accept(data);
         return data;
     }
 
     public String name() {
-        return name;
+        return meta.getName();
     }
 
-    public Permissible permissible() {
-        return permissible;
+    public CommandMeta<SubcommandData> meta() {
+        return meta;
     }
 
     public abstract void execute(CommandInteraction event, Theme theme, Permissible.PermissibleContext permissibleContext);
@@ -61,11 +64,7 @@ public abstract class SubCommand {
     public void autocomplete(CommandAutoCompleteInteraction event, Permissible.PermissibleContext permissibleContext) {
     }
 
-    protected OptionMapping findOption(CommandInteractionPayload event, String name) {
-        return event.getOption(name);
-    }
-
-    protected void replyError(MessageEmbed embed, IReplyCallback interaction) {
-        interaction.deferReply(true).flatMap(hook -> hook.editOriginalEmbeds(embed)).queue();
+    public static SubCommandMetaBuilder createMeta(String name, String description) {
+        return new SubCommandMetaBuilder(name, description);
     }
 }

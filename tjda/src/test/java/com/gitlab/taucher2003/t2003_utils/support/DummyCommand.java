@@ -1,12 +1,14 @@
 package com.gitlab.taucher2003.t2003_utils.support;
 
 import com.gitlab.taucher2003.t2003_utils.tjda.commands.Command;
+import com.gitlab.taucher2003.t2003_utils.tjda.commands.CommandGroup;
 import com.gitlab.taucher2003.t2003_utils.tjda.commands.Permissible;
 import com.gitlab.taucher2003.t2003_utils.tjda.commands.SubCommand;
 import com.gitlab.taucher2003.t2003_utils.tjda.theme.Theme;
 import net.dv8tion.jda.api.interactions.commands.CommandAutoCompleteInteraction;
 import net.dv8tion.jda.api.interactions.commands.CommandInteraction;
 
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class DummyCommand extends Command {
@@ -15,11 +17,15 @@ public class DummyCommand extends Command {
     private final AtomicInteger autocompleteTimes = new AtomicInteger();
 
     public DummyCommand(String name) {
-        super(name, "");
+        super(createMeta(name, "").build());
     }
 
-    public DummyCommand(String name, SubCommand[] subCommands) {
-        super(name, "", subCommands);
+    public DummyCommand(String name, SubCommand... subCommands) {
+        super(createMeta(name, "").setSubCommands(Arrays.asList(subCommands)).build());
+    }
+
+    public DummyCommand(String name, CommandGroup... commandGroups) {
+        super(createMeta(name, "").setGroups(Arrays.asList(commandGroups)).build());
     }
 
     @Override

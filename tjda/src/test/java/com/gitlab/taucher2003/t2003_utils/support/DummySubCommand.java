@@ -14,11 +14,11 @@ public class DummySubCommand extends SubCommand {
     private final AtomicInteger autocompleteTimes = new AtomicInteger();
 
     public DummySubCommand(String name) {
-        super(name, "");
+        super(createMeta(name, "").build());
     }
 
     public DummySubCommand(String name, Permissible permissible) {
-        super(name, "", permissible);
+        super(createMeta(name, "").setPermissible(permissible).build());
     }
 
     @Override
