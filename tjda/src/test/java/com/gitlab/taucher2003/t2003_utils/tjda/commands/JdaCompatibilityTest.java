@@ -36,7 +36,7 @@ public class JdaCompatibilityTest {
         var expectedKeys = new String[]{
                 "command.name", "command.description",
                 "command.subcommand.name", "command.subcommand.description",
-                "command.subcommand.argument.name", "command.subcommand.argument.description"
+                "command.subcommand.options.argument.name", "command.subcommand.options.argument.description"
         };
 
         assertThat(captor.getAllValues()).containsExactly(expectedKeys);

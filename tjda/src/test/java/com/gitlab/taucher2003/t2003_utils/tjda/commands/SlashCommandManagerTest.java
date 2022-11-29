@@ -58,7 +58,7 @@ class SlashCommandManagerTest {
 
         assertThat(appender.list)
                 .extracting(ILoggingEvent::getFormattedMessage, ILoggingEvent::getLevel)
-                .containsExactly(Tuple.tuple("Received interaction for unknown command dummy", Level.WARN));
+                .containsExactly(Tuple.tuple("Received interaction for unknown command 'dummy'", Level.WARN));
     }
 
     @Test
@@ -164,8 +164,8 @@ class SlashCommandManagerTest {
         assertThat(appender.list)
                 .extracting(ILoggingEvent::getFormattedMessage, ILoggingEvent::getLevel)
                 .containsExactly(
-                        Tuple.tuple("Received interaction for unknown command dummy", Level.WARN),
-                        Tuple.tuple("Received autocomplete for unknown command dummy", Level.WARN)
+                        Tuple.tuple("Received interaction for unknown command 'dummy'", Level.WARN),
+                        Tuple.tuple("Received autocomplete for unknown command 'dummy'", Level.WARN)
                 );
     }
 
@@ -189,8 +189,8 @@ class SlashCommandManagerTest {
         assertThat(appender.list)
                 .extracting(ILoggingEvent::getFormattedMessage, ILoggingEvent::getLevel)
                 .containsExactly(
-                        Tuple.tuple("Received interaction for unknown sub-command dummy/dummy-sub", Level.WARN),
-                        Tuple.tuple("Received autocomplete for unknown sub-command dummy/dummy-sub", Level.WARN)
+                        Tuple.tuple("Received interaction for unknown sub-command 'dummy dummy-sub'", Level.WARN),
+                        Tuple.tuple("Received autocomplete for unknown sub-command 'dummy dummy-sub'", Level.WARN)
                 );
     }
 
@@ -216,8 +216,8 @@ class SlashCommandManagerTest {
         assertThat(appender.list)
                 .extracting(ILoggingEvent::getFormattedMessage, ILoggingEvent::getLevel)
                 .containsExactly(
-                        Tuple.tuple("Received interaction for unknown sub-group dummy/dummy-group/dummy-sub", Level.WARN),
-                        Tuple.tuple("Received autocomplete for unknown sub-group dummy/dummy-group/dummy-sub", Level.WARN)
+                        Tuple.tuple("Received interaction for unknown sub-group 'dummy dummy-group dummy-sub'", Level.WARN),
+                        Tuple.tuple("Received autocomplete for unknown sub-group 'dummy dummy-group dummy-sub'", Level.WARN)
                 );
     }
 
@@ -243,8 +243,8 @@ class SlashCommandManagerTest {
         assertThat(appender.list)
                 .extracting(ILoggingEvent::getFormattedMessage, ILoggingEvent::getLevel)
                 .containsExactly(
-                        Tuple.tuple("Received interaction for unknown sub-command dummy/dummy-group/dummy-sub", Level.WARN),
-                        Tuple.tuple("Received autocomplete for unknown sub-command dummy/dummy-group/dummy-sub", Level.WARN)
+                        Tuple.tuple("Received interaction for unknown sub-command 'dummy dummy-group dummy-sub'", Level.WARN),
+                        Tuple.tuple("Received autocomplete for unknown sub-command 'dummy dummy-group dummy-sub'", Level.WARN)
                 );
     }
 

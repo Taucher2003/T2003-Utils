@@ -91,7 +91,7 @@ public abstract class Command implements Routable, CommandMixin {
             return;
         }
 
-        var path = event.getCommandPath().split("/");
+        var path = event.getFullCommandName().split(" ");
 
         if (path.length == 1) {
             execute(event, theme, permissibleContext);
@@ -113,7 +113,7 @@ public abstract class Command implements Routable, CommandMixin {
 
                                 command.execute(event, theme, permissibleContext);
                             },
-                            () -> LOGGER.warn("Received interaction for unknown sub-command {}", event.getCommandPath())
+                            () -> LOGGER.warn("Received interaction for unknown sub-command '{}'", event.getFullCommandName())
                     );
             return;
         }
@@ -132,7 +132,7 @@ public abstract class Command implements Routable, CommandMixin {
 
                             group.doExecuteRouting(event, theme, permissibleContext, permissibleCreator, hook);
                         },
-                        () -> LOGGER.warn("Received interaction for unknown sub-group {}", event.getCommandPath())
+                        () -> LOGGER.warn("Received interaction for unknown sub-group '{}'", event.getFullCommandName())
                 );
     }
 
@@ -145,7 +145,7 @@ public abstract class Command implements Routable, CommandMixin {
             return;
         }
 
-        var path = event.getCommandPath().split("/");
+        var path = event.getFullCommandName().split(" ");
 
         if (path.length == 1) {
             autocomplete(event, permissibleContext);
@@ -167,7 +167,7 @@ public abstract class Command implements Routable, CommandMixin {
 
                                 command.autocomplete(event, permissibleContext);
                             },
-                            () -> LOGGER.warn("Received autocomplete for unknown sub-command {}", event.getCommandPath())
+                            () -> LOGGER.warn("Received autocomplete for unknown sub-command '{}'", event.getFullCommandName())
                     );
             return;
         }
@@ -186,7 +186,7 @@ public abstract class Command implements Routable, CommandMixin {
 
                             group.doAutocompleteRouting(event, permissibleContext, permissibleCreator);
                         },
-                        () -> LOGGER.warn("Received autocomplete for unknown sub-group {}", event.getCommandPath())
+                        () -> LOGGER.warn("Received autocomplete for unknown sub-group '{}'", event.getFullCommandName())
                 );
     }
 

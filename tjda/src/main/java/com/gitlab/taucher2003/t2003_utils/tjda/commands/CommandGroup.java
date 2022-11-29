@@ -40,7 +40,7 @@ public class CommandGroup implements Routable {
     @Override
     public void doExecuteRouting(CommandInteraction event, Theme theme, Permissible.PermissibleContext permissibleContext,
                                  Function<Permissible, Permissible> permissibleCreator, SlashCommandManagerHook hook) {
-        var path = event.getCommandPath().split("/");
+        var path = event.getFullCommandName().split(" ");
 
         meta.getSubCommands()
                 .stream()
@@ -56,14 +56,14 @@ public class CommandGroup implements Routable {
 
                             subCommand.execute(event, theme, permissibleContext);
                         },
-                        () -> LOGGER.warn("Received interaction for unknown sub-command {}", event.getCommandPath())
+                        () -> LOGGER.warn("Received interaction for unknown sub-command '{}'", event.getFullCommandName())
                 );
     }
 
     @Override
     public void doAutocompleteRouting(CommandAutoCompleteInteraction event, Permissible.PermissibleContext permissibleContext,
                                       Function<Permissible, Permissible> permissibleCreator) {
-        var path = event.getCommandPath().split("/");
+        var path = event.getFullCommandName().split(" ");
 
         meta.getSubCommands()
                 .stream()
@@ -79,7 +79,7 @@ public class CommandGroup implements Routable {
 
                             subCommand.autocomplete(event, permissibleContext);
                         },
-                        () -> LOGGER.warn("Received autocomplete for unknown sub-command {}", event.getCommandPath())
+                        () -> LOGGER.warn("Received autocomplete for unknown sub-command '{}'", event.getFullCommandName())
                 );
     }
 
