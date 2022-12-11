@@ -27,7 +27,7 @@ public final class InteractionMocker {
         when(interaction.getSubcommandGroup()).thenReturn(groupName);
         when(interaction.getSubcommandName()).thenReturn(subcommandName);
         when(interaction.getCommandType()).thenReturn(Command.Type.SLASH);
-        when(interaction.getCommandPath()).thenCallRealMethod();
+        when(interaction.getFullCommandName()).thenCallRealMethod();
 
         if (interaction instanceof CommandAutoCompleteInteraction) {
             var autocompleteInteraction = (CommandAutoCompleteInteraction) interaction;

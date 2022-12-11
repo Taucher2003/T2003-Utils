@@ -5,7 +5,6 @@ import com.gitlab.taucher2003.t2003_utils.common.i18n.Replacement;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.Locale;
 
 public class LocalizedEmbedMessageBuilder extends EmbedBuilder {
@@ -67,7 +66,7 @@ public class LocalizedEmbedMessageBuilder extends EmbedBuilder {
     }
 
     @Override
-    @Nonnull
+    @NotNull
     public LocalizedEmbedMessageBuilder setAuthor(String name) {
         return setAuthor(name, new Replacement[0]);
     }
@@ -77,7 +76,7 @@ public class LocalizedEmbedMessageBuilder extends EmbedBuilder {
     }
 
     @Override
-    @Nonnull
+    @NotNull
     public LocalizedEmbedMessageBuilder setAuthor(String name, String url) {
         return setAuthor(name, url, new Replacement[0]);
     }
@@ -87,7 +86,7 @@ public class LocalizedEmbedMessageBuilder extends EmbedBuilder {
     }
 
     @Override
-    @Nonnull
+    @NotNull
     public LocalizedEmbedMessageBuilder setAuthor(String name, String url, String iconUrl) {
         return setAuthor(name, url, iconUrl, new Replacement[0]);
     }
@@ -98,7 +97,7 @@ public class LocalizedEmbedMessageBuilder extends EmbedBuilder {
     }
 
     @Override
-    @Nonnull
+    @NotNull
     public LocalizedEmbedMessageBuilder setFooter(String text) {
         return setFooter(text, new Replacement[0]);
     }
@@ -108,7 +107,7 @@ public class LocalizedEmbedMessageBuilder extends EmbedBuilder {
     }
 
     @Override
-    @Nonnull
+    @NotNull
     public LocalizedEmbedMessageBuilder setFooter(String text, String iconUrl) {
         return setFooter(text, iconUrl, new Replacement[0]);
     }
