@@ -2,7 +2,9 @@ package com.gitlab.taucher2003.t2003_utils.common.policy;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 
 public class PolicyRegistry<C, A> {
 
@@ -28,8 +30,17 @@ public class PolicyRegistry<C, A> {
         }
 
         var policy = entryOpt.get();
-
         return policy.can(context, ability, resource);
+    }
+
+    public <R> Set<A> getEnabledAbilities(C context, R resource) {
+        var entryOpt = findPolicyFor(resource);
+        if (entryOpt.isEmpty()) {
+            return Collections.emptySet();
+        }
+
+        var policy = entryOpt.get();
+        return policy.getEnabledAbilities(context, resource);
     }
 
     private final class RegistrationEntry<T> {
