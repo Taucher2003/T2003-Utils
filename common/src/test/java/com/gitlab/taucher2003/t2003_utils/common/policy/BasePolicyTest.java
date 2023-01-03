@@ -5,8 +5,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 class BasePolicyTest {
 
@@ -274,5 +278,45 @@ class BasePolicyTest {
                 .orElseGet(() -> new String[0]);
 
         assertThat(policy.getEnabledAbilities(context, resource)).containsExactlyInAnyOrder(expectedAbilitiesArr);
+    }
+
+    @Test
+    void definesPoliciesOnlyOnce() {
+        class TestPolicy extends BasePolicy<String, String, String> {
+
+            @Override
+            protected void definePolicies() {
+            }
+        }
+
+        var policy = spy(new TestPolicy());
+
+        policy.can("", "", "");
+        policy.can("", "", "");
+
+        verify(policy).definePolicies();
+    }
+
+    @Test
+    void concurrentUsage() throws InterruptedException {
+        class TestPolicy extends BasePolicy<String, String, String> {
+
+            @Override
+            protected void definePolicies() {
+            }
+        }
+
+        var policy = spy(new TestPolicy());
+
+        var executor = Executors.newCachedThreadPool();
+
+        for (var i = 0; i < 10; i++) {
+            executor.execute(() -> policy.can("", "", ""));
+        }
+
+        executor.shutdown();
+        executor.awaitTermination(20, TimeUnit.MILLISECONDS);
+
+        verify(policy).definePolicies();
     }
 }

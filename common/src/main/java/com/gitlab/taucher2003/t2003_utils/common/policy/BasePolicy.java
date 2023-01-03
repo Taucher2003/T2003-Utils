@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
@@ -28,8 +29,7 @@ public abstract class BasePolicy<R, C, A> {
         }
     }
 
-    private final Collection<Pair<Rule<R, C, A>, RuleType>> rules = new ArrayList<>();
-
+    private final AtomicReference<Collection<Pair<Rule<R, C, A>, RuleType>>> rules = new AtomicReference<>();
     private final ThreadLocal<Set<A>> currentCollector = new ThreadLocal<>();
 
     protected abstract void definePolicies();
@@ -64,7 +64,7 @@ public abstract class BasePolicy<R, C, A> {
 
     private Rule<R, C, A> rule(BiPredicate<R, C> resourceContextPred, RuleType type) {
         var rule = new Rule<>(this, resourceContextPred);
-        rules.add(new Pair<>(rule, type));
+        rules.get().add(new Pair<>(rule, type));
         return rule;
     }
 
@@ -85,13 +85,15 @@ public abstract class BasePolicy<R, C, A> {
     }
 
     Rule<R, C, A> addRule(Rule<R, C, A> rule, RuleType ruleType) {
-        rules.add(new Pair<>(rule, ruleType));
+        rules.get().add(new Pair<>(rule, ruleType));
         return rule;
     }
 
     private void evaluate(R resource, C context) {
-        definePolicies();
-        rules.forEach(pair -> {
+        if (rules.compareAndSet(null, new ArrayList<>())) {
+            definePolicies();
+        }
+        rules.get().forEach(pair -> {
             var rule = pair.first();
             var ruleType = pair.second();
 
