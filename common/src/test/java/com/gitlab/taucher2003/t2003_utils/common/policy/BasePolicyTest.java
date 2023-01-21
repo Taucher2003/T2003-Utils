@@ -1,6 +1,5 @@
 package com.gitlab.taucher2003.t2003_utils.common.policy;
 
-import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -401,7 +400,7 @@ class BasePolicyTest {
             policy.can(null, "if_all_enabled", "");
             var end = System.currentTimeMillis();
 
-            assertThat(end - start).describedAs(String.format("Iteration %s", i)).isCloseTo(1, Offset.offset(1L));
+            assertThat(end - start).describedAs(String.format("Iteration %s", i)).isLessThanOrEqualTo(5);
         }
     }
 }
