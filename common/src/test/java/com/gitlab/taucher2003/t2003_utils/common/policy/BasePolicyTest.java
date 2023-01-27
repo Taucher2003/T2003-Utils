@@ -172,18 +172,31 @@ class BasePolicyTest {
 
     @ParameterizedTest
     @CsvSource({
-            "false,false,false",
-            "true,false,false",
-            "false,true,false",
-            "true,true,true"
+            "false,false,false,false,false",
+            "false,false,false,true,false",
+            "false,false,true,false,false",
+            "false,false,true,true,false",
+            "false,true,false,false,false",
+            "false,true,false,true,false",
+            "false,true,true,false,false",
+            "false,true,true,true,false",
+            "true,false,false,false,false",
+            "true,false,false,true,false",
+            "true,false,true,true,false",
+            "true,true,false,false,true",
+            "true,true,false,true,true",
+            "true,true,true,false,false",
+            "true,true,true,true,false"
     })
-    void ifAllEnabled(boolean enableFirst, boolean enableSecond, boolean expected) {
+    void ifAllEnabled(boolean enableFirst, boolean enableSecond, boolean preventSecond, boolean enableThird, boolean expected) {
         class TestPolicy extends BasePolicy<String, String, String> {
 
             @Override
             protected void definePolicies() {
                 resourceRule(r -> enableFirst).enable("ability_1");
                 resourceRule(r -> enableSecond).enable("ability_2");
+                resourceRule(r -> preventSecond).prevent("ability_2");
+                resourceRule(r -> enableThird).prevent("unrelated");
 
                 ifAllEnabled("ability_1", "ability_2").enable("if_all_enabled");
             }
