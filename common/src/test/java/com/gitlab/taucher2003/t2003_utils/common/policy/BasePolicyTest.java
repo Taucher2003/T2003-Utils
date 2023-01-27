@@ -1,5 +1,6 @@
 package com.gitlab.taucher2003.t2003_utils.common.policy;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -393,6 +394,7 @@ class BasePolicyTest {
     }
 
     @Test
+    @Disabled("Only on demand")
     void performance() {
         class TestPolicy extends BasePolicy<String, String, String> {
 
