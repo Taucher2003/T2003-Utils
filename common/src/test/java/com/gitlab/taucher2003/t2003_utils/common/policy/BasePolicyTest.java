@@ -1,5 +1,6 @@
 package com.gitlab.taucher2003.t2003_utils.common.policy;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -7,10 +8,13 @@ import org.junit.jupiter.params.provider.CsvSource;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 class BasePolicyTest {
 
@@ -36,7 +40,7 @@ class BasePolicyTest {
                     enable("disabled_ability");
                 });
 
-                resourceRule("disabled_resource"::equals).disable("disabled_ability");
+                resourceRule("disabled_resource"::equals).prevent("disabled_ability");
             }
         }
 
@@ -69,7 +73,7 @@ class BasePolicyTest {
                     enable("disabled_ability");
                 });
 
-                contextRule("disabled_context"::equals).disable("disabled_ability");
+                contextRule("disabled_context"::equals).prevent("disabled_ability");
             }
         }
 
@@ -113,7 +117,7 @@ class BasePolicyTest {
                     enable("disabled_ability");
                 });
 
-                rule((r, c) -> "disabled_resource".equals(r) || "disabled_context".equals(c)).disable("disabled_ability");
+                rule((r, c) -> "disabled_resource".equals(r) || "disabled_context".equals(c)).prevent("disabled_ability");
             }
         }
 
@@ -169,18 +173,31 @@ class BasePolicyTest {
 
     @ParameterizedTest
     @CsvSource({
-            "false,false,false",
-            "true,false,false",
-            "false,true,false",
-            "true,true,true"
+            "false,false,false,false,false",
+            "false,false,false,true,false",
+            "false,false,true,false,false",
+            "false,false,true,true,false",
+            "false,true,false,false,false",
+            "false,true,false,true,false",
+            "false,true,true,false,false",
+            "false,true,true,true,false",
+            "true,false,false,false,false",
+            "true,false,false,true,false",
+            "true,false,true,true,false",
+            "true,true,false,false,true",
+            "true,true,false,true,true",
+            "true,true,true,false,false",
+            "true,true,true,true,false"
     })
-    void ifAllEnabled(boolean enableFirst, boolean enableSecond, boolean expected) {
+    void ifAllEnabled(boolean enableFirst, boolean enableSecond, boolean preventSecond, boolean enableThird, boolean expected) {
         class TestPolicy extends BasePolicy<String, String, String> {
 
             @Override
             protected void definePolicies() {
                 resourceRule(r -> enableFirst).enable("ability_1");
                 resourceRule(r -> enableSecond).enable("ability_2");
+                resourceRule(r -> preventSecond).prevent("ability_2");
+                resourceRule(r -> enableThird).prevent("unrelated");
 
                 ifAllEnabled("ability_1", "ability_2").enable("if_all_enabled");
             }
@@ -242,7 +259,7 @@ class BasePolicyTest {
                     enable("disabled_ability");
                 });
 
-                rule((r, c) -> "disabled_resource".equals(r) || "disabled_context".equals(c)).disable("disabled_ability");
+                rule((r, c) -> "disabled_resource".equals(r) || "disabled_context".equals(c)).prevent("disabled_ability");
             }
         }
 
@@ -278,6 +295,62 @@ class BasePolicyTest {
                 .orElseGet(() -> new String[0]);
 
         assertThat(policy.getEnabledAbilities(context, resource)).containsExactlyInAnyOrder(expectedAbilitiesArr);
+    }
+
+    @Test
+    void evaluatesOnlyNecessaryPolicies() {
+        var rule1 = (Predicate<String>) mock(Predicate.class);
+        var rule2 = (Predicate<String>) mock(Predicate.class);
+
+        class TestPolicy extends BasePolicy<String, String, String> {
+
+            @Override
+            protected void definePolicies() {
+                resourceRule(rule1).policy(() -> {
+                    enable("rule1");
+                });
+
+                resourceRule(rule2).policy(() -> {
+                    enable("rule2");
+                });
+            }
+        }
+
+        var policy = new TestPolicy();
+
+        policy.can(null, "rule1", "");
+
+        verify(rule1).test("");
+        verifyNoInteractions(rule2);
+    }
+
+    @Test
+    void evaluatesAllDependentPolicies() {
+        var rule1 = (Predicate<String>) mock(Predicate.class);
+        var rule2 = (Predicate<String>) mock(Predicate.class);
+
+        class TestPolicy extends BasePolicy<String, String, String> {
+
+            @Override
+            protected void definePolicies() {
+                resourceRule(rule1).policy(() -> {
+                    enable("rule1");
+                });
+
+                resourceRule(rule2).policy(() -> {
+                    enable("rule2");
+                });
+
+                ifEnabled("rule1").policy(() -> enable("rule3"));
+            }
+        }
+
+        var policy = new TestPolicy();
+
+        policy.can(null, "rule3", "");
+
+        verify(rule1).test("");
+        verifyNoInteractions(rule2);
     }
 
     @Test
@@ -318,5 +391,31 @@ class BasePolicyTest {
         executor.awaitTermination(20, TimeUnit.MILLISECONDS);
 
         verify(policy).definePolicies();
+    }
+
+    @Test
+    @Disabled("Only on demand")
+    void performance() {
+        class TestPolicy extends BasePolicy<String, String, String> {
+
+            @Override
+            protected void definePolicies() {
+                resourceRule(r -> true).enable("ability_1");
+                resourceRule(r -> false).enable("ability_2");
+
+                ifAllEnabled("ability_1", "ability_2").enable("if_all_enabled");
+            }
+        }
+
+        var policy = new TestPolicy();
+        policy.can(null, "if_all_enabled", "");
+
+        for (var i = 0; i < 10000; i++) {
+            var start = System.currentTimeMillis();
+            policy.can(null, "if_all_enabled", "");
+            var end = System.currentTimeMillis();
+
+            assertThat(end - start).describedAs(String.format("Iteration %s", i)).isLessThanOrEqualTo(5);
+        }
     }
 }
