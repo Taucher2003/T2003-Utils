@@ -1,4 +1,4 @@
-package com.gitlab.taucher2003.t2003_utils.common.policy;
+package com.gitlab.taucher2003.t2003_utils.common.policy_old;
 
 import org.junit.jupiter.api.Test;
 
