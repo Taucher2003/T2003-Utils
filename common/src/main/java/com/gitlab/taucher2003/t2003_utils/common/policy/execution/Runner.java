@@ -108,11 +108,11 @@ public class Runner<RESOURCE, CONTEXT, ABILITY> {
                 return remainingSteps.getOrDefault(RuleAction.Action.PREVENT, Collections.emptyList());
             }
 
-            var remainingEnablers = remainingSteps.values().stream().flatMap(List::stream).collect(Collectors.toList());
-            if (remainingEnablers.isEmpty()) {
+            if (remainingSteps.getOrDefault(RuleAction.Action.ENABLE, Collections.emptyList()).isEmpty()) {
                 state.prevented = true;
+                return Collections.emptyList();
             }
-            return remainingEnablers;
+            return remainingSteps.values().stream().flatMap(List::stream).collect(Collectors.toList());
         }
 
         private EvaluationStep<RESOURCE, CONTEXT, ABILITY> stepWithLowestScore(Iterable<EvaluationStep<RESOURCE, CONTEXT, ABILITY>> remainingSteps) {

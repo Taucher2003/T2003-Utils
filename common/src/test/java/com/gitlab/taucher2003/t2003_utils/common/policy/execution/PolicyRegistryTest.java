@@ -13,18 +13,20 @@ import static org.mockito.Mockito.when;
 class PolicyRegistryTest {
 
     @Test
-    void returnsCorrectEvaluationContext() {
+    void canThroughContextHolder() {
+        var ability = "test_ability";
         var resource = new Object();
         var context = new Object();
 
         var policy = (Policy<Object, Object, String>) mock(Policy.class);
         var evaluationContext = (EvaluationContext<Object, Object, String>) mock(EvaluationContext.class);
         when(policy.forContext(context)).thenReturn(evaluationContext);
+        when(evaluationContext.can(resource, ability)).thenReturn(true);
 
         var registry = new PolicyRegistry<Object, String>();
         registry.registerPolicy(Object.class, policy);
 
-        assertThat(registry.forContext(context, resource)).isEqualTo(evaluationContext);
+        assertThat(registry.forContext(context).forResource(resource).can(ability)).isTrue();
     }
 
     @Test
@@ -76,6 +78,23 @@ class PolicyRegistryTest {
         verifyNoInteractions(unrelatedPolicy2);
         verify(policy).forContext(context);
         verify(evaluationContext).can(resource, ability);
+    }
+
+    @Test
+    void getEnabledAbilitiesThroughContextHolder() {
+        var resource = new Object();
+        var context = new Object();
+        var enabledAbilities = Set.of("ability_1", "ability_2");
+
+        var policy = (Policy<Object, Object, String>) mock(Policy.class);
+        var evaluationContext = (EvaluationContext<Object, Object, String>) mock(EvaluationContext.class);
+        when(policy.forContext(context)).thenReturn(evaluationContext);
+        when(evaluationContext.getEnabledAbilities(resource)).thenReturn(enabledAbilities);
+
+        var registry = new PolicyRegistry<Object, String>();
+        registry.registerPolicy(Object.class, policy);
+
+        assertThat(registry.forContext(context).forResource(resource).getEnabledAbilities()).containsExactlyElementsOf(enabledAbilities);
     }
 
     @Test

@@ -14,23 +14,26 @@ public class PolicyRegistry<CONTEXT, ABILITY> {
         policies.add(new RegistrationEntry<>(resourceClass, policy));
     }
 
-    public <RESOURCE> Optional<Policy<RESOURCE, CONTEXT, ABILITY>> findPolicyFor(RESOURCE resource) {
+    public <RESOURCE> Optional<Policy<RESOURCE, CONTEXT, ABILITY>> findPolicyForClass(Class<RESOURCE> resourceClass) {
         //noinspection unchecked
         return policies
                 .stream()
-                .filter(entry -> entry.resourceClass.isInstance(resource))
+                .filter(entry -> entry.resourceClass.isAssignableFrom(resourceClass))
                 .findFirst()
-                .map(entry -> (Policy<RESOURCE, CONTEXT, ABILITY>) entry.abilityMap);
+                .map(entry -> (Policy<RESOURCE, CONTEXT, ABILITY>) entry.policy);
     }
 
-    public <RESOURCE> EvaluationContext<RESOURCE, CONTEXT, ABILITY> forContext(CONTEXT context, RESOURCE resource) {
-        var entryOpt = findPolicyFor(resource);
-        if (entryOpt.isEmpty()) {
-            return null;
+    public <RESOURCE> Optional<Policy<RESOURCE, CONTEXT, ABILITY>> findPolicyFor(RESOURCE resource) {
+        if (resource == null) {
+            return Optional.empty();
         }
 
-        var policy = entryOpt.get();
-        return policy.forContext(context);
+        //noinspection unchecked
+        return findPolicyForClass((Class<RESOURCE>) resource.getClass());
+    }
+
+    public ContextHolder<CONTEXT, ABILITY> forContext(CONTEXT context) {
+        return new ContextHolder<>(context, this);
     }
 
     public <RESOURCE> boolean can(CONTEXT context, RESOURCE resource, ABILITY ability) {
@@ -56,11 +59,11 @@ public class PolicyRegistry<CONTEXT, ABILITY> {
     private final class RegistrationEntry<RESOURCE> {
 
         private final Class<RESOURCE> resourceClass;
-        private final Policy<RESOURCE, CONTEXT, ABILITY> abilityMap;
+        private final Policy<RESOURCE, CONTEXT, ABILITY> policy;
 
-        private RegistrationEntry(Class<RESOURCE> resourceClass, Policy<RESOURCE, CONTEXT, ABILITY> abilityMap) {
+        private RegistrationEntry(Class<RESOURCE> resourceClass, Policy<RESOURCE, CONTEXT, ABILITY> policy) {
             this.resourceClass = resourceClass;
-            this.abilityMap = abilityMap;
+            this.policy = policy;
         }
     }
 }

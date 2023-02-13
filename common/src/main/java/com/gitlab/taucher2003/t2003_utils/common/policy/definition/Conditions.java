@@ -225,7 +225,7 @@ public final class Conditions {
                     (resource, context) -> type.isInstance(resource) && condition.test(type.cast(resource), context),
                     score,
                     true,
-                    false
+                    true
             );
         }
     }
