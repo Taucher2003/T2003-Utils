@@ -5,6 +5,7 @@ import com.gitlab.taucher2003.t2003_utils.common.policy.execution.EvaluationStep
 import com.gitlab.taucher2003.t2003_utils.common.policy.execution.Policy;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
@@ -46,6 +47,20 @@ public abstract class PolicyDefinition<RESOURCE, CONTEXT, ABILITY> {
 
     protected Condition<RESOURCE, CONTEXT, ABILITY> ifEnabled(ABILITY ability) {
         return new Conditions.Ability<>(ability);
+    }
+
+    @SafeVarargs
+    protected final Condition<RESOURCE, CONTEXT, ABILITY> ifAnyEnabled(ABILITY ability, ABILITY... additionalAbilities) {
+        var condition = ifEnabled(ability);
+        return Arrays.stream(additionalAbilities)
+                .reduce(condition, (cond, innerAbility) -> cond.or(ifEnabled(innerAbility)), Condition::or);
+    }
+
+    @SafeVarargs
+    protected final Condition<RESOURCE, CONTEXT, ABILITY> ifAllEnabled(ABILITY ability, ABILITY... additionalAbilities) {
+        var condition = ifEnabled(ability);
+        return Arrays.stream(additionalAbilities)
+                .reduce(condition, (cond, innerAbility) -> cond.and(ifEnabled(innerAbility)), Condition::and);
     }
 
     protected Rule<RESOURCE, CONTEXT, ABILITY> rule(Condition<RESOURCE, CONTEXT, ABILITY> condition) {
