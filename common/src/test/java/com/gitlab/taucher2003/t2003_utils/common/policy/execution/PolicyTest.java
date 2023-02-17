@@ -176,7 +176,7 @@ class PolicyTest {
                 rule(resourceCondition(r -> enableFirst)).enable("ability_1");
                 rule(resourceCondition(r -> enableSecond)).enable("ability_2");
 
-                rule(ifEnabled("ability_1").or(ifEnabled("ability_2"))).enable("if_any_enabled");
+                rule(ifAnyEnabled("ability_1", "ability_2")).enable("if_any_enabled");
             }
         }
 
@@ -213,13 +213,32 @@ class PolicyTest {
                 rule(resourceCondition(r -> preventSecond)).prevent("ability_2");
                 rule(resourceCondition(r -> enableThird)).prevent("unrelated");
 
-                rule(ifEnabled("ability_1").and(ifEnabled("ability_2"))).enable("if_all_enabled");
+                rule(ifAllEnabled("ability_1", "ability_2")).enable("if_all_enabled");
             }
         }
 
         var definition = new TestPolicy();
         var policy = definition.initialize();
         assertThat(policy.forContext("context").can("resource", "if_all_enabled")).isEqualTo(expected);
+    }
+
+    @Test
+    void ifAnyAllEnabledWithSingleAbility() {
+        class TestPolicy extends PolicyDefinition<String, String, String> {
+
+            @Override
+            protected void definePolicies() {
+                rule(condition((__, ___) -> true)).enable("ability_1");
+
+                rule(ifAnyEnabled("ability_1")).enable("if_any_enabled");
+                rule(ifAllEnabled("ability_1")).enable("if_all_enabled");
+            }
+        }
+
+        var definition = new TestPolicy();
+        var policy = definition.initialize();
+        assertThat(policy.forContext("context").can("resource", "if_any_enabled")).isTrue();
+        assertThat(policy.forContext("context").can("resource", "if_all_enabled")).isTrue();
     }
 
     @Test
