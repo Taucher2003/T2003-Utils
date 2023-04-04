@@ -1,5 +1,8 @@
 package com.gitlab.taucher2003.t2003_utils.common.policy.definition;
 
+import com.gitlab.taucher2003.t2003_utils.common.policy.definition.conditions.AbilityCondition;
+import com.gitlab.taucher2003.t2003_utils.common.policy.definition.conditions.ForClassConditionBuilder;
+import com.gitlab.taucher2003.t2003_utils.common.policy.definition.conditions.SimpleCondition;
 import com.gitlab.taucher2003.t2003_utils.common.policy.execution.AbilityMap;
 import com.gitlab.taucher2003.t2003_utils.common.policy.execution.EvaluationStep;
 import com.gitlab.taucher2003.t2003_utils.common.policy.execution.Policy;
@@ -18,35 +21,35 @@ public abstract class PolicyDefinition<RESOURCE, CONTEXT, ABILITY> {
     protected abstract void definePolicies();
 
     protected Condition<RESOURCE, CONTEXT, ABILITY> resourceCondition(Predicate<RESOURCE> condition) {
-        return resourceCondition(condition, Conditions.DEFAULT_SCORE);
+        return resourceCondition(condition, Condition.DEFAULT_SCORE);
     }
 
     protected Condition<RESOURCE, CONTEXT, ABILITY> contextCondition(Predicate<CONTEXT> condition) {
-        return contextCondition(condition, Conditions.DEFAULT_SCORE);
+        return contextCondition(condition, Condition.DEFAULT_SCORE);
     }
 
     protected Condition<RESOURCE, CONTEXT, ABILITY> condition(BiPredicate<RESOURCE, CONTEXT> condition) {
-        return condition(condition, Conditions.DEFAULT_SCORE);
+        return condition(condition, Condition.DEFAULT_SCORE);
     }
 
     protected Condition<RESOURCE, CONTEXT, ABILITY> resourceCondition(Predicate<RESOURCE> condition, int score) {
-        return new Conditions.Simple<>((resource, context) -> condition.test(resource), score, true, false);
+        return new SimpleCondition<>((resource, context) -> condition.test(resource), score, true, false);
     }
 
     protected Condition<RESOURCE, CONTEXT, ABILITY> contextCondition(Predicate<CONTEXT> condition, int score) {
-        return new Conditions.Simple<>(((resource, context) -> condition.test(context)), score, false, true);
+        return new SimpleCondition<>(((resource, context) -> condition.test(context)), score, false, true);
     }
 
     protected Condition<RESOURCE, CONTEXT, ABILITY> condition(BiPredicate<RESOURCE, CONTEXT> condition, int score) {
-        return new Conditions.Simple<>(condition, score, true, true);
+        return new SimpleCondition<>(condition, score, true, true);
     }
 
-    protected <LOCAL_RESOURCE extends RESOURCE> Conditions.ForClass<RESOURCE, LOCAL_RESOURCE, CONTEXT, ABILITY> forClass(Class<LOCAL_RESOURCE> type) {
-        return new Conditions.ForClass<>(type);
+    protected <LOCAL_RESOURCE extends RESOURCE> ForClassConditionBuilder<RESOURCE, LOCAL_RESOURCE, CONTEXT, ABILITY> forClass(Class<LOCAL_RESOURCE> type) {
+        return new ForClassConditionBuilder<>(type);
     }
 
     protected Condition<RESOURCE, CONTEXT, ABILITY> ifEnabled(ABILITY ability) {
-        return new Conditions.Ability<>(ability);
+        return new AbilityCondition<>(ability);
     }
 
     @SafeVarargs
