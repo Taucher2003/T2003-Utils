@@ -1,8 +1,8 @@
 package com.gitlab.taucher2003.t2003_utils.common.policy.execution;
 
 import com.gitlab.taucher2003.t2003_utils.common.policy.definition.Condition;
-import com.gitlab.taucher2003.t2003_utils.common.policy.definition.Conditions;
 import com.gitlab.taucher2003.t2003_utils.common.policy.definition.PolicyDefinition;
+import com.gitlab.taucher2003.t2003_utils.common.policy.definition.conditions.AbilityCondition;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -371,7 +371,7 @@ class PolicyTest {
         var condition1 = (Condition<String, String, String>) mock(Condition.class);
         var condition2 = (Condition<String, String, String>) mock(Condition.class);
         var condition3 = (Condition<String, String, String>) mock(Condition.class);
-        var ifEnabledCondition = new Conditions.Ability<String, String, String>("ability");
+        var ifEnabledCondition = new AbilityCondition<String, String, String>("ability");
         var abilitySpy = spy(ifEnabledCondition);
         when(condition2.test(eq(""), eq(""), any(EvaluationContext.class))).thenReturn(true);
 

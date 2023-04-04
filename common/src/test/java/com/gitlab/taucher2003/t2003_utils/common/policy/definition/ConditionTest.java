@@ -1,5 +1,6 @@
 package com.gitlab.taucher2003.t2003_utils.common.policy.definition;
 
+import com.gitlab.taucher2003.t2003_utils.common.policy.definition.conditions.SimpleCondition;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -158,7 +159,7 @@ class ConditionTest {
     }
 
     Condition<Object, Object, Object> createStatic(boolean result) {
-        return new Conditions.Simple<>((__, ___) -> result, 0, false, false);
+        return new SimpleCondition<>((__, ___) -> result, 0, false, false);
     }
 
     static Stream<Arguments> fourArguments() {

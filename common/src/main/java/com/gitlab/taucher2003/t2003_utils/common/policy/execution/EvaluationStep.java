@@ -1,8 +1,9 @@
 package com.gitlab.taucher2003.t2003_utils.common.policy.execution;
 
 import com.gitlab.taucher2003.t2003_utils.common.policy.definition.Condition;
-import com.gitlab.taucher2003.t2003_utils.common.policy.definition.Conditions;
 import com.gitlab.taucher2003.t2003_utils.common.policy.definition.RuleAction;
+import com.gitlab.taucher2003.t2003_utils.common.policy.definition.conditions.AbilityCondition;
+import com.gitlab.taucher2003.t2003_utils.common.policy.definition.conditions.OrCondition;
 
 import java.util.stream.Stream;
 
@@ -32,14 +33,14 @@ public class EvaluationStep<RESOURCE, CONTEXT, ABILITY> {
     }
 
     public Stream<EvaluationStep<RESOURCE, CONTEXT, ABILITY>> flattened(EvaluationContext<RESOURCE, CONTEXT, ABILITY> evaluationContext) {
-        if (condition instanceof Conditions.Or) {
-            return ((Conditions.Or<RESOURCE, CONTEXT, ABILITY>) condition)
+        if (condition instanceof OrCondition) {
+            return ((OrCondition<RESOURCE, CONTEXT, ABILITY>) condition)
                     .conditions()
                     .flatMap(c -> new EvaluationStep<>(action, c).flattened(evaluationContext));
         }
 
-        if (condition instanceof Conditions.Ability) {
-            var ability = ((Conditions.Ability<RESOURCE, CONTEXT, ABILITY>) condition).ability();
+        if (condition instanceof AbilityCondition) {
+            var ability = ((AbilityCondition<RESOURCE, CONTEXT, ABILITY>) condition).ability();
             var steps = evaluationContext.runnerForAbility(ability).getSteps();
 
             if (steps.stream().map(EvaluationStep::getAction).allMatch(RuleAction.Action.ENABLE::equals)) {
