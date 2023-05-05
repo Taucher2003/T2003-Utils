@@ -17,9 +17,12 @@ class MemoizeTest {
         var provider = (Supplier<String>) mock(Supplier.class);
         when(provider.get()).thenReturn("a value");
 
-        class TestClass implements Memoize {
+        class TestClass {
+
+            final Memoize memoize = new Memoize();
+
             String memoized() {
-                return memoize("memoize", provider);
+                return memoize.memoize("memoize", provider);
             }
         }
 
@@ -37,9 +40,12 @@ class MemoizeTest {
         var provider = (Supplier<String>) mock(Supplier.class);
         when(provider.get()).thenReturn("a value");
 
-        class TestClass implements Memoize {
+        class TestClass {
+
+            final Memoize memoize = new Memoize();
+
             String memoized() {
-                return memoize("memoize", provider);
+                return memoize.memoize("memoize", provider);
             }
         }
 
@@ -50,7 +56,7 @@ class MemoizeTest {
 
         verify(provider).get();
 
-        testClass.forgetMemoize("memoize");
+        testClass.memoize.forgetMemoize("memoize");
         testClass.memoized();
 
         // 2 in total, one before forget and one after

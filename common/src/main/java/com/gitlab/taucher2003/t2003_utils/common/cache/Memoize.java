@@ -1,26 +1,19 @@
 package com.gitlab.taucher2003.t2003_utils.common.cache;
 
-import com.gitlab.taucher2003.t2003_utils.common.data.Pair;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-public interface Memoize {
+public class Memoize {
 
-    final class Memoizers {
-        private static final Map<Pair<Memoize, String>, Memoizer<?>> memoizers = new HashMap<>();
+    private final Map<String, Memoizer<?>> memoizers = new HashMap<>();
 
-        private Memoizers() {
-        }
+    public <T> T memoize(String name, Supplier<T> supplier) {
+        return (T) memoizers.computeIfAbsent(name, key -> new Memoizer<>(supplier)).get();
     }
 
-    default <T> T memoize(String name, Supplier<T> supplier) {
-        return (T) Memoizers.memoizers.computeIfAbsent(new Pair<>(this, name), key -> new Memoizer<>(supplier)).get();
-    }
-
-    default void forgetMemoize(String name) {
-        Optional.ofNullable(Memoizers.memoizers.get(new Pair<>(this, name))).ifPresent(Memoizer::invalidate);
+    public void forgetMemoize(String name) {
+        Optional.ofNullable(memoizers.get(name)).ifPresent(Memoizer::invalidate);
     }
 }
