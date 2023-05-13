@@ -16,7 +16,7 @@
     </modules>
 
     <properties>
-        <t2003-utils.version>1.1-beta.5${t2003-utils.version-suffix}</t2003-utils.version>
+        <t2003-utils.version>1.1-beta.9${t2003-utils.version-suffix}</t2003-utils.version>
         <t2003-utils.version-suffix/>
         <t2003-utils.java.version>11</t2003-utils.java.version>
         <maven.compiler.source>${t2003-utils.java.version}</maven.compiler.source>
