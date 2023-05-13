@@ -7,7 +7,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 class PolicyRegistryTest {
@@ -74,8 +74,10 @@ class PolicyRegistryTest {
         registry.registerPolicy(Object.class, policy);
 
         assertThat(registry.can(context, resource, ability)).isTrue();
-        verifyNoInteractions(unrelatedPolicy1);
-        verifyNoInteractions(unrelatedPolicy2);
+        verify(unrelatedPolicy1).setRegistry(registry);
+        verify(unrelatedPolicy2).setRegistry(registry);
+        verifyNoMoreInteractions(unrelatedPolicy1);
+        verifyNoMoreInteractions(unrelatedPolicy2);
         verify(policy).forContext(context);
         verify(evaluationContext).can(resource, ability);
     }
@@ -142,8 +144,10 @@ class PolicyRegistryTest {
         registry.registerPolicy(Object.class, policy);
 
         assertThat(registry.getEnabledAbilities(context, resource)).containsExactlyElementsOf(enabledAbilities);
-        verifyNoInteractions(unrelatedPolicy1);
-        verifyNoInteractions(unrelatedPolicy2);
+        verify(unrelatedPolicy1).setRegistry(registry);
+        verify(unrelatedPolicy2).setRegistry(registry);
+        verifyNoMoreInteractions(unrelatedPolicy1);
+        verifyNoMoreInteractions(unrelatedPolicy2);
         verify(evaluationContext).getEnabledAbilities(resource);
     }
 }

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.BiPredicate;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 public abstract class PolicyDefinition<RESOURCE, CONTEXT, ABILITY> {
@@ -78,6 +79,10 @@ public abstract class PolicyDefinition<RESOURCE, CONTEXT, ABILITY> {
 
     protected void prevent(ABILITY ability) {
         currentRule.get().actions.add(new RuleAction<>(RuleAction.Action.PREVENT, ability));
+    }
+
+    protected <DELEGATE_RESOURCE> Delegate<RESOURCE, DELEGATE_RESOURCE, CONTEXT, ABILITY> delegate(Function<RESOURCE, DELEGATE_RESOURCE> mapper) {
+        return new Delegate<>(this, mapper);
     }
 
     public Policy<RESOURCE, CONTEXT, ABILITY> initialize() {

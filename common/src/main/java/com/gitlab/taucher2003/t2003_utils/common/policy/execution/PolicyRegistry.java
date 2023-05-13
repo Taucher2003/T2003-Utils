@@ -12,6 +12,7 @@ public class PolicyRegistry<CONTEXT, ABILITY> {
 
     public <RESOURCE> void registerPolicy(Class<RESOURCE> resourceClass, Policy<RESOURCE, CONTEXT, ABILITY> policy) {
         policies.add(new RegistrationEntry<>(resourceClass, policy));
+        policy.setRegistry(this);
     }
 
     public <RESOURCE> Optional<Policy<RESOURCE, CONTEXT, ABILITY>> findPolicyForClass(Class<RESOURCE> resourceClass) {

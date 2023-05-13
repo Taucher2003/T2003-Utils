@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 
 public class Runner<RESOURCE, CONTEXT, ABILITY> {
 
+    public static final int FLAG_DISABLE_STEP_OPTIMISATION = 1;
+
     private final Map<Pair<RESOURCE, CONTEXT>, State> states = new HashMap<>();
 
     private final List<EvaluationStep<RESOURCE, CONTEXT, ABILITY>> steps;
@@ -33,17 +35,23 @@ public class Runner<RESOURCE, CONTEXT, ABILITY> {
     }
 
     public boolean enabled(RESOURCE resource, CONTEXT context) {
-        var state = states.computeIfAbsent(new Pair<>(resource, context), key -> new State());
-
-        if (!state.evaluated) {
-            run(resource, context, state);
-        }
+        var state = getState(resource, context, 0);
 
         return state.passes();
     }
 
-    private void run(RESOURCE resource, CONTEXT context, State state) {
-        for (var it = orderedSteps(state); it.hasNext(); ) {
+    public State getState(RESOURCE resource, CONTEXT context, int evaluationFlags) {
+        var state = states.computeIfAbsent(new Pair<>(resource, context), key -> new State());
+
+        if (!state.evaluated) {
+            run(resource, context, state, evaluationFlags);
+        }
+
+        return state;
+    }
+
+    private void run(RESOURCE resource, CONTEXT context, State state, int evaluationFlags) {
+        for (var it = orderedSteps(state, evaluationFlags); it.hasNext(); ) {
             if (state.prevented) {
                 break;
             }
@@ -66,14 +74,14 @@ public class Runner<RESOURCE, CONTEXT, ABILITY> {
         state.evaluated = true;
     }
 
-    private Iterator<EvaluationStep<RESOURCE, CONTEXT, ABILITY>> orderedSteps(State state) {
+    private Iterator<EvaluationStep<RESOURCE, CONTEXT, ABILITY>> orderedSteps(State state, int evaluationFlags) {
         var steps = flattenedSteps();
 
         if (steps.size() > 50) {
             return steps.stream().sorted(Comparator.comparingDouble(step -> step.score(evaluationContext))).iterator();
         }
 
-        return new StepIterator(steps, state);
+        return new StepIterator(steps, state, evaluationFlags);
     }
 
     private List<EvaluationStep<RESOURCE, CONTEXT, ABILITY>> flattenedSteps() {
@@ -84,10 +92,12 @@ public class Runner<RESOURCE, CONTEXT, ABILITY> {
 
         private final Map<RuleAction.Action, List<EvaluationStep<RESOURCE, CONTEXT, ABILITY>>> remainingSteps;
         private final State state;
+        private final int evaluationFlags;
 
-        private StepIterator(Collection<EvaluationStep<RESOURCE, CONTEXT, ABILITY>> remainingSteps, State state) {
+        private StepIterator(Collection<EvaluationStep<RESOURCE, CONTEXT, ABILITY>> remainingSteps, State state, int evaluationFlags) {
             this.remainingSteps = remainingSteps.stream().collect(Collectors.groupingBy(EvaluationStep::getAction));
             this.state = state;
+            this.evaluationFlags = evaluationFlags;
         }
 
         @Override
@@ -104,6 +114,10 @@ public class Runner<RESOURCE, CONTEXT, ABILITY> {
         }
 
         private List<EvaluationStep<RESOURCE, CONTEXT, ABILITY>> getRemainingSteps() {
+            if ((evaluationFlags & FLAG_DISABLE_STEP_OPTIMISATION) == FLAG_DISABLE_STEP_OPTIMISATION) {
+                return remainingSteps.values().stream().flatMap(List::stream).collect(Collectors.toList());
+            }
+
             if (state.enabled) {
                 return remainingSteps.getOrDefault(RuleAction.Action.PREVENT, Collections.emptyList());
             }
@@ -128,7 +142,7 @@ public class Runner<RESOURCE, CONTEXT, ABILITY> {
         }
     }
 
-    private static class State {
+    public static class State {
 
         private boolean enabled;
         private boolean prevented;
@@ -136,6 +150,14 @@ public class Runner<RESOURCE, CONTEXT, ABILITY> {
 
         private boolean passes() {
             return !prevented && enabled;
+        }
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public boolean isPrevented() {
+            return prevented;
         }
     }
 }

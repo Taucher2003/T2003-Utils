@@ -13,10 +13,12 @@ public class EvaluationContext<RESOURCE, CONTEXT, ABILITY> {
 
     private final AbilityMap<RESOURCE, CONTEXT, ABILITY> abilityMap;
     private final CONTEXT context;
+    private final PolicyRegistry<CONTEXT, ABILITY> registry;
 
-    public EvaluationContext(AbilityMap<RESOURCE, CONTEXT, ABILITY> abilityMap, CONTEXT context) {
+    public EvaluationContext(AbilityMap<RESOURCE, CONTEXT, ABILITY> abilityMap, CONTEXT context, PolicyRegistry<CONTEXT, ABILITY> registry) {
         this.abilityMap = abilityMap;
         this.context = context;
+        this.registry = registry;
     }
 
     public boolean can(RESOURCE resource, ABILITY ability) {
@@ -35,6 +37,10 @@ public class EvaluationContext<RESOURCE, CONTEXT, ABILITY> {
                     a.addAll(b);
                     return a;
                 });
+    }
+
+    public PolicyRegistry<CONTEXT, ABILITY> getRegistry() {
+        return registry;
     }
 
     @ApiStatus.Internal

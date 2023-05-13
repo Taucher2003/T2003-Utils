@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
@@ -621,5 +622,142 @@ class PolicyTest {
 
         verify(rule1).test(isNull(), eq(""), any(EvaluationContext.class));
         verifyNoInteractions(rule2);
+    }
+
+    @Test
+    void delegateThrowsWithoutRegistry() {
+        class TestPolicy extends PolicyDefinition<String, String, String> {
+
+            @Override
+            protected void definePolicies() {
+                delegate(String::lines).forAbilities("test");
+            }
+        }
+
+        var definition = new TestPolicy();
+        var policy = definition.initialize();
+
+        assertThatThrownBy(() -> policy.forContext("").can("", "test"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Delegate can't be used in Policy without PolicyRegistry");
+    }
+
+    @Test
+    void delegate() {
+        class StringPolicy extends PolicyDefinition<String, String, String> {
+
+            @Override
+            protected void definePolicies() {
+                delegate(String::chars).forAbilities("test");
+            }
+        }
+
+        class IntStreamPolicy extends PolicyDefinition<IntStream, String, String> {
+
+            @Override
+            protected void definePolicies() {
+                rule(resourceCondition(stream -> stream.count() > 1)).enable("test");
+            }
+        }
+
+        var registry = new PolicyRegistry<String, String>();
+        var stringPolicy = new StringPolicy().initialize();
+        registry.registerPolicy(String.class, stringPolicy);
+        registry.registerPolicy(IntStream.class, new IntStreamPolicy().initialize());
+
+        var evaluationContext = stringPolicy.forContext("");
+        assertThat(evaluationContext.can("", "test")).isFalse();
+        assertThat(evaluationContext.can("test", "test")).isTrue();
+    }
+
+    @Test
+    void delegateOnlyDelegatesSpecifiedAbilities() {
+        class StringPolicy extends PolicyDefinition<String, String, String> {
+
+            @Override
+            protected void definePolicies() {
+                delegate(String::chars).forAbilities("test");
+            }
+        }
+
+        class IntStreamPolicy extends PolicyDefinition<IntStream, String, String> {
+
+            @Override
+            protected void definePolicies() {
+                rule(resourceCondition(stream -> stream.count() > 1)).enable("test");
+                rule(resourceCondition(__ -> true)).enable("always_true");
+            }
+        }
+
+        var registry = new PolicyRegistry<String, String>();
+        var stringPolicy = new StringPolicy().initialize();
+        registry.registerPolicy(String.class, stringPolicy);
+        registry.registerPolicy(IntStream.class, new IntStreamPolicy().initialize());
+
+        var evaluationContext = stringPolicy.forContext("");
+        assertThat(evaluationContext.can("", "always_true")).isFalse();
+        assertThat(evaluationContext.can("test", "always_true")).isFalse();
+    }
+
+    @Test
+    void delegatedAbilityCanBePreventedByOrigin() {
+        class StringPolicy extends PolicyDefinition<String, String, String> {
+
+            @Override
+            protected void definePolicies() {
+                delegate(String::chars).forAbilities("test");
+
+                rule(resourceCondition(resource -> resource.length() == 2)).prevent("test");
+            }
+        }
+
+        class IntStreamPolicy extends PolicyDefinition<IntStream, String, String> {
+
+            @Override
+            protected void definePolicies() {
+                rule(resourceCondition(stream -> stream.count() > 1)).enable("test");
+            }
+        }
+
+        var registry = new PolicyRegistry<String, String>();
+        var stringPolicy = new StringPolicy().initialize();
+        registry.registerPolicy(String.class, stringPolicy);
+        registry.registerPolicy(IntStream.class, new IntStreamPolicy().initialize());
+
+        var evaluationContext = stringPolicy.forContext("");
+        assertThat(evaluationContext.can("", "test")).isFalse();
+        assertThat(evaluationContext.can("test", "test")).isTrue();
+        assertThat(evaluationContext.can("te", "test")).isFalse();
+    }
+
+    @Test
+    void delegatedAbilityCanBePreventedByDelegate() {
+        class StringPolicy extends PolicyDefinition<String, String, String> {
+
+            @Override
+            protected void definePolicies() {
+                delegate(String::chars).forAbilities("test");
+
+                rule(resourceCondition(resource -> resource.length() > 1)).enable("test");
+            }
+        }
+
+        class IntStreamPolicy extends PolicyDefinition<IntStream, String, String> {
+
+            @Override
+            protected void definePolicies() {
+                rule(resourceCondition(stream -> stream.count() == 2)).prevent("test");
+            }
+        }
+
+        var registry = new PolicyRegistry<String, String>();
+        var stringPolicy = new StringPolicy().initialize();
+        registry.registerPolicy(String.class, stringPolicy);
+        registry.registerPolicy(IntStream.class, new IntStreamPolicy().initialize());
+
+        var evaluationContext = stringPolicy.forContext("");
+        assertThat(evaluationContext.can("", "test")).isFalse();
+        assertThat(evaluationContext.can("test", "test")).isTrue();
+        assertThat(evaluationContext.can("te", "test")).isFalse();
     }
 }
