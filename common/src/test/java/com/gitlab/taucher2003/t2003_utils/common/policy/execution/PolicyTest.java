@@ -760,4 +760,21 @@ class PolicyTest {
         assertThat(evaluationContext.can("test", "test")).isTrue();
         assertThat(evaluationContext.can("te", "test")).isFalse();
     }
+
+    @Test
+    void delegateEvaluatesToNull() {
+        class TestPolicy extends PolicyDefinition<String, String, String> {
+
+            @Override
+            protected void definePolicies() {
+                delegate(ignored -> null).forAbilities("test");
+            }
+        }
+
+        var registry = new PolicyRegistry<String, String>();
+        var policy = new TestPolicy().initialize();
+        registry.registerPolicy(String.class, policy);
+
+        assertThat(policy.forContext("").can("", "test")).isFalse();
+    }
 }

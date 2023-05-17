@@ -52,6 +52,10 @@ public class Delegate<RESOURCE, DELEGATE_RESOURCE, CONTEXT, ABILITY> {
         }
 
         var delegateResource = mapper.apply(resource);
+        if (delegateResource == null) {
+            return Optional.empty();
+        }
+
         var resourceContext =
                 (EvaluationContext<DELEGATE_RESOURCE, CONTEXT, ABILITY>) registry.forContext(context).forResourceClass(delegateResource.getClass());
         if (resourceContext == null) {
