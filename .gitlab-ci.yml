@@ -212,16 +212,6 @@ gemnasium-maven-dependency_scanning:
       when: never
     - !reference [ .default-rules, rules ]
 
-license_scanning:
-  stage: security
-  needs: [ ]
-  variables:
-    LM_JAVA_VERSION: "11"
-  rules:
-    - if: $LICENSE_MANAGEMENT_DISABLED
-      when: never
-    - !reference [ .default-rules, rules ]
-
 .secret-analyzer:
   stage: security
   needs: [ ]
